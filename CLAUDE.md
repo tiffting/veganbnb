@@ -7,8 +7,9 @@
 ## AI Assistant Instructions (IMPORTANT: Follow before every commit)
 
 Before suggesting any commit message, ALWAYS:
+
 1. Update CLAUDE.md: "What's Implemented", "Next Priority Tasks", "Proposed Task Breakdown", timestamp
-2. Update DEVELOPMENT.md: "Next Steps" section  
+2. Update DEVELOPMENT.md: "Next Steps" section
 3. Update README.md: Any relevant status indicators
 4. THEN suggest commit message
 
@@ -40,20 +41,22 @@ This ensures documentation stays current across all AI sessions.
 - Development pattern: Types → Mock data → UI → Real API
 - API cost: ~$0.80 for demo
 
-**Next Priority Tasks**:
+**Next Priority Tasks** (7-hour timeline):
 
 1. ✅ ~~Firebase project setup~~
 2. ✅ ~~Create core TypeScript interfaces~~
-3. Implement category-adaptive review analysis
-4. Build chatbot with multi-category context
+3. **CRITICAL**: Implement category-adaptive review analysis (hero feature)
+4. **CRITICAL**: Build chatbot with multi-category context
+5. Basic UI with safety score display
+6. Deploy + demo preparation
 
 ---
 
 ### Winning Positioning
 
-**Problem**: Vegan travelers cobble together HappyCow + Vegvisits + Google + Reddit + Facebook for EVERY trip. No platform offers complete travel intelligence across restaurants, accommodations, tours, and local experiences.
+**Problem**: Vegan travelers juggle HappyCow + Vegvisits + Google + Reddit + Facebook for EVERY trip. No platform offers complete travel intelligence across restaurants, accommodations, tours, and local experiences.
 
-**Solution**: First AI-powered complete vegan travel intelligence platform using multi-modal AI (NLP review analysis, conversational assistant, computer vision) to provide explainable safety scores across all travel categories and eliminate the "cobbling problem."
+**Solution**: First AI-powered complete vegan travel intelligence platform using multi-modal AI (NLP review analysis, conversational assistant, computer vision) to provide explainable safety scores across all travel categories and eliminate the fragmented research problem.
 
 **Key differentiators**:
 
@@ -64,7 +67,7 @@ This ensures documentation stays current across all AI sessions.
 
 ---
 
-### MVP Scope (11.5-hr build window)
+### MVP Scope (7-hr build window - FOCUSED)
 
 **TIER 1 - MUST DEMO:**
 
@@ -74,7 +77,7 @@ This ensures documentation stays current across all AI sessions.
 - User authentication (Firebase)
 - Map view with category filtering
 
-**TIER 2 - IF TIME (2-3hrs each):**
+**TIER 2 - IF TIME (unlikely with 7-hr window):**
 
 - **Computer Vision Menu Translator**: Upload photo → translated menu + vegan options highlighted
 - Mobile PWA optimization
@@ -260,7 +263,7 @@ Format as structured JSON.
 **Prudhvi (Lead)**: API routes, Gemini integration, safety scores
 **Koray**: AI chatbot UI, multi-category views, map integration
 **Dhruthi**: Detail views, score explanation modals, auth UI
-**Harshini**: Dataset prep (tours/events), computer vision features
+**Harshini**: Dataset prep (tours/events), UI components (computer vision moved to TIER 2)
 **Tiff**: Design system, wireframes, dataset coordination, Firebase setup ✅, TypeScript interfaces ✅
 
 _Note: These are initial suggestions based on stated interests/locations. Final assignments to be determined as a team._
@@ -308,20 +311,21 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 
 ### Timeline (Sun, Nov 16)
 
-**9:30-10:00 CET**: Standup, task assignments, API key distribution, dataset handoff
-**10:00-13:00**: Core features (auth, multi-category data loading, category-adaptive analyzer, basic UI)
-**13:00-14:00**: Lunch + integration check
-**14:00-17:00**: Chatbot integration, category-specific UI, polish analyzer
-**17:00-19:00**: Menu translator (if time), testing, deploy
-**19:00-20:00**: Demo prep, presentation rehearsal
-**20:00-21:00**: Demos + judging
+**10:00-10:15 CET**: Opening remarks, team setup, final task assignments
+**10:15-12:30**: Core features (category-adaptive analyzer, basic UI, data loading)
+**12:30-13:30**: Lunch + integration check
+**13:30-16:00**: Chatbot integration, score explanation UI
+**16:00-17:15**: Testing, deploy, demo data prep
+**17:15**: Coding ends - demo prep only
+**17:30-18:30**: 5-minute presentations
+**18:30-19:00**: Judging + awards
 
 ---
 
 ### Demo Script (5 minutes)
 
 **0:00-0:30 | The Problem**
-"As vegan travelers, we cobble together research from HappyCow for restaurants, Vegvisits for hotels, Google for tours, Reddit for events. Every trip = 5+ sources. No one gives us complete travel intelligence. Until now."
+"As vegan travelers, we juggle research from HappyCow for restaurants, Vegvisits for hotels, Google for tours, Reddit for events. Every trip = 5+ sources. No one gives us complete travel intelligence. Until now."
 
 **0:30-2:00 | Multi-Category AI Analysis (HERO)**
 
@@ -334,7 +338,7 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 - Quick click through restaurant (different signals: cross-contamination, staff knowledge)
 - "Our LLM adapts to each category. Same explainable intelligence across all travel decisions."
 
-**2:00-3:30 | Complete Trip Planning (SHOWSTOPPER)**
+**2:00-4:00 | Complete Trip Planning (SHOWSTOPPER)**
 
 - Switch to chat interface
 - **Live demo**: "Plan my 3-day vegan trip to Berlin"
@@ -345,13 +349,7 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
     - 1 weekend event
 - Follow-up: "Which hotel has the best vegan breakfast?"
 - Shows contextual understanding across categories
-- "No more cobbling. One conversation. Complete trip."
-
-**3:30-4:00 | Menu Translator (IF BUILT)**
-
-- Upload German menu photo
-- Instant translation + vegan highlighting
-- "Works with any language, removes barrier at restaurants"
+- "No more juggling. One conversation. Complete trip."
 
 **4:00-4:45 | Impact & Innovation**
 
@@ -372,7 +370,7 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 **Impact** (Judges' #1 concern):
 
 - Addresses millions of vegan travelers globally
-- Solves real pain point (cobbling multiple sources)
+- Solves real pain point (juggling multiple sources)
 - First complete vegan travel platform
 - Authentic founder story (Prudhvi "lives this daily", and Tiff does this for trips multiple times a year)
 
