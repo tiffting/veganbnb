@@ -21,7 +21,7 @@ Next.js 15 + TypeScript + Tailwind + Google Gemini API + Firebase
 Create `.env.local` with:
 ```
 GEMINI_API_KEY=your_google_gemini_api_key
-# Firebase config (to be added)
+# Firebase config ✅ 
 # Maps API key (to be added)
 ```
 

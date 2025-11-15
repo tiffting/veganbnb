@@ -108,4 +108,4 @@ const mockData = { ... }
 ## Reference
 
 **Documentation**: [README.md](README.md) | [CLAUDE.md](CLAUDE.md)  
-**Next Steps**: Firebase setup → Type definitions → API routes → Components
+**Next Steps**: Type definitions → API routes → Components → Category analysis

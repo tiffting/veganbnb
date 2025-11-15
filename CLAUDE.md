@@ -6,16 +6,17 @@
 
 ## Current Project State (IMPORTANT: Update this as you go for cross-session continuity)
 
-**Last Updated**: Nov 15, 2025 8:30pm CET (pre-hackathon setup)
+**Last Updated**: Nov 15, 2025 9:15pm CET (Firebase complete)
 
 **What's Implemented**:
 
 - ✅ Next.js 15 project with TypeScript (strict mode)
 - ✅ ESM modules (`"type": "module"` in package.json)
 - ✅ Google Gemini API integration working (`gemini-2.5-flash`)
-- ✅ Working test files: `tests/test-gemini.js`
+- ✅ Firebase setup complete (Auth + Firestore, tested)
+- ✅ Working test files: `tests/test-gemini.js`, `tests/test-firebase.js`
 - ✅ Documentation: README.md, DEVELOPMENT.md, CLAUDE.md
-- ✅ Environment: `.env.local` with `GEMINI_API_KEY`
+- ✅ Environment: `.env.local` with API keys
 
 **Technical Setup**: See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup, file structure, testing, and team coordination.
 
@@ -28,7 +29,7 @@
 
 **Next Priority Tasks**:
 
-1. Firebase project setup
+1. ✅ ~~Firebase project setup~~
 2. Create core TypeScript interfaces
 3. Implement category-adaptive review analysis
 4. Build chatbot with multi-category context
@@ -243,7 +244,7 @@ Format as structured JSON.
 
 ### Proposed Task Breakdown _(to discuss with team)_
 
-**Prudhvi (Lead)**: Firebase, API routes, Gemini integration, safety scores
+**Prudhvi (Lead)**: API routes, Gemini integration, safety scores
 **Koray**: AI chatbot UI, multi-category views, map integration
 **Dhruthi**: Detail views, score explanation modals, auth UI
 **Harshini**: Dataset prep (tours/events), computer vision features
@@ -261,7 +262,7 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 
 1. Join Discord server
 2. Clone repo when created
-3. Install: Node.js 18+, pnpm/npm, Firebase CLI
+3. Install: Node.js 18+, pnpm/npm
 4. Add API keys to .env.local
 
 **Prudhvi + Tiff:**
