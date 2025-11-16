@@ -128,21 +128,39 @@ This ensures documentation stays current across all AI sessions.
    - Day-by-day breakdown with travel time estimates
    - Booking status tracking
 
-**Eitan (Explorer Features)**:
+**Eitan (Explorer Features + User Preferences)**:
 1. **Map Integration** (2 hours)
    - Embed map (Google Maps or Mapbox) 
    - Plot mock venue locations with safety score markers
    - Basic zoom/pan functionality
 
-2. **Filter Interface** (2 hours)
+2. **Filter Interface** (1.5 hours)
    - Price range slider (€, €€, €€€)
    - Rating filter (4+ stars)
    - Distance radius selector  
    - "Currently Open" toggle
 
+3. **Persistent User Preferences** (1.5 hours)
+   - Preference panel component (budget, min safety score, dietary restrictions)
+   - localStorage persistence for demo
+   - Auto-apply preferences across chat and map interfaces
+   - "Remember my settings" UX
+
+**Technical Specification for Preferences**:
+```typescript
+interface UserPreferences {
+  budgetRange: "€" | "€€" | "€€€" | "any"
+  minSafetyScore: number // 70, 80, 90+  
+  dietaryRestrictions: string[] // ["gluten-free", "nut-free"]
+  maxDistance: number // km radius for map
+  openNow: boolean // filter for currently open venues
+}
+```
+
 **Shared Components**:
 - Both interfaces consume the same mock data
 - Safety scores and venue details consistent across both UX
+- **User preferences apply universally** (chat recommendations + map results)
 - Mobile-responsive design for both personas
 
 ### **Demo Script Enhancement**
@@ -152,8 +170,9 @@ This ensures documentation stays current across all AI sessions.
 
 **Demo Flow Addition**:
 - Show chat interface for initial recommendations
-- **Planner Demo**: "Export to Calendar" → generates trip timeline
-- **Explorer Demo**: Switch to map view → filter by budget → real-time discovery
+- **Preferences Demo**: "Let me set my budget preferences as a student" → Set budget €, safety 80+ → "Now watch how the AI remembers this"
+- **Planner Demo**: "Export to Calendar" → generates trip timeline (respects preferences)
+- **Explorer Demo**: Switch to map view → preferences auto-applied → real-time discovery
 
 **Market Impact**:
 - **TAM Expansion**: Addresses different travel behaviors (not just vegan vs non-vegan)
@@ -619,10 +638,11 @@ Format as structured JSON.
 - Booking integration and trip execution tools
 - Mobile-responsive planning interface
 
-**Eitan (Explorer Persona)**:
+**Eitan (Explorer Persona + User Preferences)**:
 - Interactive map with venue markers and safety scores
 - Real-time filtering (price, rating, distance, hours)
 - Location-based discovery and "near me" functionality
+- **Persistent user preferences system** (budget, safety score, dietary restrictions)
 - Mobile-responsive exploration interface
 
 **Data Curation Team (Jean-Luc + Felix - Berlin)**:
