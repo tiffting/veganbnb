@@ -1,6 +1,6 @@
 # VeganBnB - AI-Powered Complete Vegan Travel Intelligence Platform
 
-**Team**: Tiff Ting (Lead/Frontend), Eitan (Data Sourcing), Felix (Data Sourcing), Jean-Luc (Data Sourcing)
+**Team**: Tiff Ting (Lead/Frontend), Eitan (Frontend), Felix (Data Curation), Jean-Luc (Data Curation)
 
 First AI-powered complete vegan travel intelligence platform providing explainable safety scores across restaurants, accommodations, tours, and events using multi-modal AI.
 
