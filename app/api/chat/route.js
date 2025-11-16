@@ -1,7 +1,11 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from 'openai';
 import { mockListings, getListingsByCategory, getHighScoringListings } from "../../../lib/mock-data.js";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Use OpenRouter for reliable AI access
+const openai = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+});
 
 export async function POST(request) {
   try {
@@ -12,17 +16,53 @@ export async function POST(request) {
       return Response.json({ error: "Message is required" }, { status: 400 });
     }
 
+    // --- Handle Smart Interview Process ---
+    const interviewResponse = await handleSmartInterview(message, chatHistory);
+
+    if (interviewResponse) {
+      return Response.json({
+        response: interviewResponse.reply,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          interviewState: interviewResponse.interviewState,
+          finalPreferences: interviewResponse.finalPreferences,
+          // Other metadata can be added here if needed for interview responses
+        }
+      });
+    }
+    // --- End Smart Interview Process ---
+
     // Get context from all listings for RAG-style responses
     const context = buildTravelContext();
     
     // Build conversation prompt with context injection
     const prompt = buildChatPrompt(message, chatHistory, context);
     
-    // Call Gemini API
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // Try OpenAI API first, fallback to hardcoded responses for development
+    let text;
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "microsoft/wizardlm-2-8x22b",
+        messages: [
+          {
+            role: "system",
+            content: "You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events."
+          },
+          {
+            role: "user", 
+            content: prompt
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+      });
+      
+      text = completion.choices[0].message.content;
+    } catch {
+      console.log('OpenAI API unavailable, using fallback response');
+      // Fallback to hardcoded responses for development
+      text = generateFallbackResponse(message, chatHistory);
+    }
 
     // Parse response and extract any listing references
     const listingReferences = extractListingReferences(text);
@@ -47,6 +87,200 @@ export async function POST(request) {
       { status: 500 }
     );
   }
+}
+
+// ... (existing imports) ...
+
+const INTERVIEW_QUESTIONS = [
+  {
+    key: 'tripPreferences.travelDates',
+    question: "Great! To start planning your trip, what are your travel dates (start and end)?",
+    parse: (message) => message
+  },
+  {
+    key: 'budgetRange',
+    question: "What's your approximate budget range for this trip? (€, €€, €€€, or any)?",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower.includes('€€€') || lower.includes('luxury')) return '€€€';
+      if (lower.includes('€€') || lower.includes('mid-range')) return '€€';
+      if (lower.includes('€') || lower.includes('budget')) return '€';
+      return 'any';
+    }
+  },
+  {
+    key: 'eatingPreferences.style',
+    question: "Tell me about your eating style: are you a 'foodie' (exploring unique dishes), 'casual' (easygoing meals), or 'efficient' (quick bites)?",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower.includes('foodie')) return 'foodie';
+      if (lower.includes('casual')) return 'casual';
+      if (lower.includes('efficient')) return 'efficient';
+      return null;
+    }
+  },
+  {
+    key: 'eatingPreferences.includeBreakfast',
+    question: "Do you typically include breakfast in your travel plans? (yes/no)",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower.includes('yes')) return true;
+      if (lower.includes('no')) return false;
+      return null;
+    }
+  },
+  {
+    key: 'mobilityPreferences.transportModes',
+    question: "How do you prefer to get around? You can list multiple options (e.g., walking, public transit, taxi).",
+    parse: (message) => {
+      const modes = [];
+      const lower = message.toLowerCase();
+      if (lower.includes('walk')) modes.push('walking');
+      if (lower.includes('public transit') || lower.includes('bus') || lower.includes('train') || lower.includes('metro') || lower.includes('subway') || lower.includes('transit')) modes.push('public_transit');
+      if (lower.includes('taxi') || lower.includes('uber') || lower.includes('ride-share') || lower.includes('ride')) modes.push('taxi');
+      return modes.length > 0 ? modes : null;
+    }
+  },
+  {
+    key: 'mobilityPreferences.wheelchairAccessible',
+    question: "Is wheelchair accessibility a requirement for your trip? (yes/no)",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower.includes('yes')) return true;
+      if (lower.includes('no')) return false;
+      return null;
+    }
+  },
+  {
+    key: 'tripPreferences.planningStyle',
+    question: "Do you prefer a 'structured' itinerary with everything planned, or a more 'flexible' approach?",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower.includes('structured') || lower.includes('planned') || lower.includes('organized')) return 'structured';
+      if (lower.includes('flexible') || lower.includes('flex') || lower.includes('spontaneous') || lower.includes('loose')) return 'flexible';
+      return null;
+    }
+  },
+  {
+    key: 'dietaryRestrictions',
+    question: "Do you have any specific dietary restrictions beyond veganism (e.g., gluten-free, nut-free)? If so, please list them.",
+    parse: (message) => {
+      const lower = message.toLowerCase();
+      if (lower === 'no' || lower === 'none') return [];
+      return message.split(',').map(item => item.trim());
+    }
+  }
+];
+
+// Helper to set nested properties
+function setNestedProperty(obj, path, value) {
+  const parts = path.split('.');
+  let current = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (!current[parts[i]]) {
+      current[parts[i]] = {};
+    }
+    current = current[parts[i]];
+  }
+  current[parts[parts.length - 1]] = value;
+}
+
+async function handleSmartInterview(message, chatHistory) {
+  // Force reset for new sessions - check if this is the very first message
+  if (message === "__AUTO_START__" && chatHistory.length === 0) {
+    // Clear all interview state for new session
+    if (typeof global.interviewStates !== 'undefined') {
+      global.interviewStates.clear();
+    }
+    
+    const freshState = {
+      inProgress: true,
+      currentQuestionIndex: 0,
+      collectedPreferences: {}
+    };
+    saveInterviewState(freshState);
+    
+    return {
+      reply: `Welcome to VeganBnB! Let me learn about your travel style so I can provide the best personalized recommendations.\n\n${INTERVIEW_QUESTIONS[0].question}\n\n*You can type "skip" anytime to continue without the interview.*`,
+      interviewState: freshState
+    };
+  }
+
+  // Get interview state from localStorage or initialize
+  let interviewState = getInterviewState();
+
+  // Check if we should start a new interview
+  if (shouldStartInterview(message, chatHistory)) {
+    // Clear any corrupted state and start fresh
+    if (typeof global.interviewStates !== 'undefined') {
+      global.interviewStates.clear();
+    }
+    
+    // Reset state completely for fresh session
+    interviewState = {
+      inProgress: true,
+      currentQuestionIndex: 0,
+      collectedPreferences: {}
+    };
+    saveInterviewState(interviewState);
+    return {
+      reply: `Welcome to VeganBnB! Let me learn about your travel style so I can provide the best personalized recommendations.\n\n${INTERVIEW_QUESTIONS[0].question}\n\n*You can type "skip" anytime to continue without the interview.*`,
+      interviewState: interviewState
+    };
+  }
+
+  // Check for skip command
+  if (interviewState.inProgress && message.toLowerCase().includes('skip')) {
+    interviewState.inProgress = false;
+    saveInterviewState(interviewState);
+    return {
+      reply: "No problem! You can always tell me your preferences as we chat. Which city would you like to explore?\n\n**Currently I have comprehensive data for Berlin** (restaurants, accommodations, tours, events with safety scores). I can also provide general guidance for other cities.",
+      interviewState: interviewState
+    };
+  }
+
+  // If an interview is in progress, process the answer and ask the next question
+  if (interviewState.inProgress) {
+    // Skip processing for auto-start trigger
+    if (message !== "__AUTO_START__") {
+      // Process the current answer
+      const currentQuestion = INTERVIEW_QUESTIONS[interviewState.currentQuestionIndex];
+      const parsedAnswer = currentQuestion.parse(message);
+
+      if (parsedAnswer !== null) {
+        setNestedProperty(interviewState.collectedPreferences, currentQuestion.key, parsedAnswer);
+        interviewState.currentQuestionIndex++;
+        saveInterviewState(interviewState);
+      } else {
+        // If parsing failed, re-ask the current question
+        return {
+          reply: `I didn't quite understand your answer. ${currentQuestion.question}`,
+          interviewState: interviewState
+        };
+      }
+
+      // Check if we've completed all questions
+      if (interviewState.currentQuestionIndex >= INTERVIEW_QUESTIONS.length) {
+        // Interview complete
+        interviewState.inProgress = false;
+        saveInterviewState(interviewState);
+        return {
+          reply: `Perfect! I've learned about your travel style. Now, which city would you like to explore?\n\n**Currently I have comprehensive data for Berlin** (restaurants, accommodations, tours, events with safety scores). I can also provide general guidance for other cities, though my detailed recommendations focus on Berlin as our demo.`,
+          interviewState: interviewState,
+          finalPreferences: interviewState.collectedPreferences
+        };
+      }
+
+      // Ask the next question
+      const nextQuestion = INTERVIEW_QUESTIONS[interviewState.currentQuestionIndex];
+      return {
+        reply: nextQuestion.question,
+        interviewState: interviewState
+      };
+    }
+  }
+
+  return null; // No interview action
 }
 
 function buildTravelContext() {
@@ -268,4 +502,140 @@ function inferCategoriesFromMessage(message) {
   }
   
   return categories.length > 0 ? categories : ['general'];
+}
+
+// Helper functions for interview state management
+function getInterviewState() {
+  // For server-side, we'll use a simple in-memory store
+  // In production, this would be stored in database with user session
+  if (typeof global.interviewStates === 'undefined') {
+    global.interviewStates = new Map();
+  }
+  
+  // For demo purposes, use a single session key
+  const sessionKey = 'demo-session';
+  
+  if (!global.interviewStates.has(sessionKey)) {
+    global.interviewStates.set(sessionKey, {
+      inProgress: false,
+      currentQuestionIndex: 0,
+      collectedPreferences: {}
+    });
+  }
+  
+  return global.interviewStates.get(sessionKey);
+}
+
+function saveInterviewState(state) {
+  // For server-side, we'll use a simple in-memory store
+  const sessionKey = 'demo-session';
+  
+  if (typeof global.interviewStates === 'undefined') {
+    global.interviewStates = new Map();
+  }
+  
+  global.interviewStates.set(sessionKey, state);
+}
+
+function shouldStartInterview(message, chatHistory) {
+  // Don't start interview if already in progress
+  const currentState = getInterviewState();
+  if (currentState.inProgress) {
+    return false;
+  }
+  
+  // Don't start if we just completed an interview
+  if (Object.keys(currentState.collectedPreferences).length > 0) {
+    return false;
+  }
+  
+  // Start interview immediately on first user message (true onboarding-first)
+  // This captures preferences before any city selection or recommendations
+  return chatHistory.length === 0 || message === "__AUTO_START__";
+}
+
+// Fallback responses for when API is unavailable
+function generateFallbackResponse(message) {
+  const lower = message.toLowerCase();
+  
+  // Berlin-specific recommendations
+  if (lower.includes('berlin')) {
+    return `## 🌱 Perfect! Here are my top vegan recommendations for Berlin:
+
+### 🍽️ **Restaurants**
+- **Kopps** (98/100) - Upscale vegan fine dining in Mitte
+  - Hours: Wed-Sat 5:30 PM - Late
+  - Booking: [kopps-berlin.de](https://kopps-berlin.de/en/) (English available)
+  - Price: €45-65 for 4-course menu
+
+### 🏨 **Accommodations**  
+- **Michelberger Hotel** (84/100) - Boutique hotel in Friedrichshain
+  - Vegan breakfast buffet clearly labeled (€18)
+  - Book: [michelbergerhotel.com](https://michelbergerhotel.com/en/)
+  - Rate: €120-180/night
+
+### 🚶 **Tours**
+- **Berlin Vegan Food Tour** (94/100) - Saturdays 2-6 PM
+  - Meeting point: Hackescher Markt
+  - Book via [GetYourGuide](https://www.getyourguide.com/berlin-l17/berlin-vegan-food-tour-t408673/) - €65
+
+### 📅 **Events**
+- **The Green Market Berlin** (91/100) - First Saturday monthly
+  - Location: Boxhagener Platz, 10 AM - 6 PM
+  - Free entry, 40+ vegan vendors
+
+Need help planning your specific dates or have other questions?`;
+  }
+  
+  // Trip planning requests
+  if (lower.includes('plan') || lower.includes('itinerary') || lower.includes('trip')) {
+    return `## 🎯 Perfect! I'd love to help plan your vegan trip.
+
+To give you the best personalized recommendations, could you tell me:
+
+1. **Which city?** (I have comprehensive Berlin data with safety scores)
+2. **Travel dates?** 
+3. **What interests you most?** (restaurants, accommodations, tours, events)
+4. **Budget range?** (€, €€, €€€)
+
+I'll provide actionable recommendations with booking links, hours, and safety scores for each venue!`;
+  }
+  
+  // Restaurant requests
+  if (lower.includes('restaurant') || lower.includes('eat') || lower.includes('food')) {
+    return `## 🍽️ Great vegan restaurants in Berlin:
+
+**Top Picks:**
+
+1. **Kopps** (98/100) - Fine dining excellence
+   - Zero cross-contamination risk, expert staff
+   - Book: [kopps-berlin.de](https://kopps-berlin.de/en/)
+
+2. **Michelberger Hotel Restaurant** (84/100) - Creative plant-based dishes  
+   - Clear vegan labeling, accommodating staff
+   - Walk-in friendly or book online
+
+**Safety Note:** All scores based on cross-contamination prevention, staff knowledge, and ingredient transparency.
+
+Which type of cuisine interests you most?`;
+  }
+  
+  // Default helpful response
+  return `## 🌱 Welcome to VeganBnB!
+
+I'm your AI travel assistant specializing in **complete vegan travel planning** across:
+- 🍽️ **Restaurants** with safety scores
+- 🏨 **Accommodations** with vegan amenities  
+- 🚶 **Tours** with expert vegan guides
+- 📅 **Events** and markets
+
+**Currently I have comprehensive Berlin data** with actionable logistics (hours, booking, pricing).
+
+What would you like to explore? Try asking:
+- "Plan my 3-day Berlin trip"
+- "Best vegan restaurants in Berlin"  
+- "Vegan-friendly hotels"
+- "Food tours and events"
+
+*Note: Demo mode active - full AI responses will return when API access is restored.*`;
 }

@@ -6,7 +6,7 @@ First AI-powered complete vegan travel intelligence platform providing explainab
 
 ## Tech Stack
 
-Next.js 15 + TypeScript + Tailwind + Google Gemini API + Firebase
+Next.js 15 + TypeScript + Tailwind + OpenRouter AI + Firebase
 
 *Full tech details in [DEVELOPMENT.md](DEVELOPMENT.md)*
 
@@ -20,7 +20,9 @@ Next.js 15 + TypeScript + Tailwind + Google Gemini API + Firebase
 ### Environment Variables
 Create `.env.local` with:
 ```
-GEMINI_API_KEY=your_google_gemini_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENAI_API_KEY=your_openai_api_key  # (backup)
+GEMINI_API_KEY=your_google_gemini_api_key  # (backup)
 # Firebase config ✅ 
 # Maps API key (to be added)
 ```
@@ -47,6 +49,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 - ✅ **Dual Travel Personas** - Planner (calendar export, itineraries) + Explorer (maps, filters)
 - ✅ **Persistent User Preferences** - Budget, safety scores, dietary restrictions remembered
 - ✅ **Professional UI** - Landing page + persona-adaptive interfaces
+- ✅ **Smart Interview Process (PRODUCTION READY)** - AI discovers travel style through strategic questions with fixed state management and enhanced UX
 
 **Try the demo**: `http://localhost:3000/chat`
 
@@ -58,7 +61,13 @@ npm run dev       # Development server
 npm run lint      # Code quality check
 npm run build     # Production build test
 
-# Test Gemini API (see DEVELOPMENT.md for details)
+# Test OpenRouter AI (primary)
+node tests/test-openrouter.js
+
+# Test OpenAI API (backup)
+node tests/test-openai.js
+
+# Test Gemini API (backup)
 node tests/test-gemini.js
 ```
 

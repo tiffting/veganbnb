@@ -292,10 +292,34 @@ export interface User {
  * User travel and dietary preferences
  */
 export interface UserPreferences {
-  dietaryRestrictions?: string[]; // e.g., ['gluten-free', 'nut-free']
-  preferredCategories?: Category[];
-  homeLocation?: string;
-  travelStyle?: 'budget' | 'mid-range' | 'luxury';
+  budgetRange?: "€" | "€€" | "€€€" | "any";
+  minSafetyScore?: number; // 70, 80, 90+
+  dietaryRestrictions?: string[]; // ["gluten-free", "nut-free"]
+  maxDistance?: number; // km radius for map
+  openNow?: boolean; // filter for currently open venues
+
+  // NEW: Enhanced travel preferences
+  eatingPreferences?: {
+    includeBreakfast?: boolean;
+    includeSnacks?: boolean;
+    style?: "foodie" | "casual" | "efficient";
+    preferredMealTimes?: {
+      breakfast?: string;  // "8:00"
+      lunch?: string;     // "12:30"
+      dinner?: string;    // "19:00"
+    };
+  };
+  mobilityPreferences?: {
+    transportModes?: ("walking" | "public_transit" | "taxi")[];
+    wheelchairAccessible?: boolean;
+    maxWalkingDistance?: number; // minutes
+    preferredPace?: "leisurely" | "moderate" | "efficient";
+  };
+  tripPreferences?: {
+    planningStyle?: "structured" | "flexible";
+    groupSize?: number;
+    travelDates?: { start: string; end: string; };
+  };
 }
 
 // ============================================================================
