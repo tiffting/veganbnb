@@ -39,13 +39,14 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## Current Status
 
-🎉 **PRODUCTION READY - ALL CORE FEATURES COMPLETE + AI ENHANCEMENTS**:
+🎯 **BREAKTHROUGH POSITIONING - DUAL PERSONA TRAVEL AI**:
 - ✅ **Category-Adaptive AI Analyzer** - Hero feature with explainable safety scores
 - ✅ **AI Travel Assistant Chatbot** - Showstopper feature with multi-category planning
 - ✅ **Actionable Logistics** - eSIM-friendly booking, pricing, schedules for international travelers
-- ✅ **AI-Powered Quick Actions** - Context-intelligent conversation flow with Gemini-generated suggestions and welcome message optimization
-- ✅ **Professional UI** - Landing page + chat interface
-- ✅ **RAG Architecture** - Complete database context with human-readable formatting
+- ✅ **AI-Powered Quick Actions** - Context-intelligent conversation flow with Gemini-generated suggestions
+- ✅ **Dual Travel Personas** - Planner (calendar export, itineraries) + Explorer (maps, filters)
+- ✅ **Persistent User Preferences** - Budget, safety scores, dietary restrictions remembered
+- ✅ **Professional UI** - Landing page + persona-adaptive interfaces
 
 **Try the demo**: `http://localhost:3000/chat`
 

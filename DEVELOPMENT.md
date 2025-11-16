@@ -129,9 +129,11 @@ const mockData = { ... }
 ## Reference
 
 **Documentation**: [README.md](README.md) | [CLAUDE.md](CLAUDE.md) | [DESIGN.md](DESIGN.md)
-**Next Steps**: ✅ ~~Chatbot integration~~ → ✅ ~~**Actionable logistics complete**~~ → ✅ ~~**AI-powered quick actions + UX polish**~~ → **Frontend polish** (Tiff + Eitan) + **Data curation** (Jean-Luc + Felix) → Deploy → Demo prep (PRODUCTION READY!)
+**Next Steps**: ✅ ~~Chatbot integration~~ → ✅ ~~**Actionable logistics complete**~~ → ✅ ~~**AI-powered quick actions + UX polish**~~ → **Dual persona interfaces** (Planner + Explorer) + **Data curation** (Jean-Luc + Felix) → Deploy → Demo prep (PRODUCTION READY!)
 
 **DEMO-CRITICAL COMPLETED**: ✅ Enhanced mock data + chatbot responses with actionable logistics (hours, schedules, eSIM-friendly booking) + AI-powered contextual quick actions with welcome message optimization
+
+**STRATEGIC FOCUS**: Dual persona interfaces (Planner vs Explorer) - no traditional listing pages needed
 
 **TECHNICAL IMPLEMENTATION**: Hybrid architecture complete - stable data stored locally with comprehensive logistics fields
 

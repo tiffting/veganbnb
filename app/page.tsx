@@ -40,13 +40,15 @@ export default function Home() {
                         <Link href="/chat">
                             <Button size="lg" className="bg-green-500 hover:bg-green-600">
                                 <Bot className="w-5 h-5 mr-2" />
-                                Plan Your Trip with AI
+                                Start Planning My Trip
                             </Button>
                         </Link>
-                        <Button variant="outline" size="lg">
-                            <MapPin className="w-5 h-5 mr-2" />
-                            Browse Berlin Listings
-                        </Button>
+                        <Link href="/chat">
+                            <Button variant="outline" size="lg">
+                                <MapPin className="w-5 h-5 mr-2" />
+                                Explore & Discover
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 
@@ -125,6 +127,10 @@ export default function Home() {
                                 <div className="flex items-start gap-3">
                                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                                     <div className="text-sm text-gray-600">Context-aware responses based on your preferences</div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                    <div className="text-sm text-gray-600">Actionable logistics with booking links and schedules</div>
                                 </div>
                             </div>
                         </div>

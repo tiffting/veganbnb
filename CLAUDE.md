@@ -63,8 +63,8 @@ This ensures documentation stays current across all AI sessions.
 5. ✅ ~~**URGENT**: Enhance chatbot with actionable logistics (hours, booking, scheduling)~~
 6. ✅ ~~**UX POLISH**: Dynamic quick actions, auto-submit, real venue data, multiline input~~
 7. ✅ ~~**AI ENHANCEMENT**: AI-powered quick actions with intelligent contextual suggestions~~
-8. **BREAKTHROUGH PIVOT**: Dual traveler persona support (Planner vs Explorer interfaces)
-9. Deploy + demo preparation  
+8. ✅ ~~**BREAKTHROUGH PIVOT**: Dual traveler persona support (Planner vs Explorer interfaces)~~
+9. Deploy + demo preparation
 10. **OPTIONAL**: Computer vision menu translator (TIER 2 feature)
 
 **DEMO GAP RESOLVED**: ✅ Chatbot now provides actionable trip planning with eSIM-friendly booking methods, complete operational logistics, and AI-powered contextual quick actions for intuitive conversation flow
@@ -78,17 +78,20 @@ This ensures documentation stays current across all AI sessions.
 ### **Persona 1: The Planner (Tiff's Travel Style)**
 
 **Characteristics:**
-- Wants structured, detailed itineraries 
+
+- Wants structured, detailed itineraries
 - Values advance planning and concrete logistics
 - Needs actionable outputs for trip execution
 - Prefers organized schedules with reservations
 
 **Pain Points:**
+
 - "I discussed great options with AI, now how do I execute this trip?"
 - "I need calendar events with locations, times, and booking details"
 - "How do I turn this conversation into a real itinerary?"
 
 **Solution Features (Tiff implementing):**
+
 - **Calendar Export**: Generate Google Calendar events from chat recommendations
 - **Itinerary Builder**: Convert chat recommendations to structured daily plans
 - **Booking Integration**: Direct links to reservation systems with pre-filled details
@@ -97,70 +100,78 @@ This ensures documentation stays current across all AI sessions.
 ### **Persona 2: The Explorer (Eitan's Travel Style)**
 
 **Characteristics:**
+
 - Spontaneous, location-based discovery
 - Budget-conscious (student lifestyle)
-- Values real-time, contextual recommendations  
+- Values real-time, contextual recommendations
 - Prefers map-based exploration with filters
 
 **Pain Points:**
+
 - "I'm walking around, what's good vegan food nearby under €15?"
 - "Show me all 4+ star vegan places within 10 minutes walk"
 - "I don't want to plan ahead, I want to discover as I go"
 
 **Solution Features (Eitan implementing):**
-- **Map Interface**: Interactive map with vegan venue markers
-- **Real-time Filters**: Price range, rating, distance, currently open
-- **Location-Based Discovery**: "Near me" functionality with live recommendations
-- **Quick Decision Support**: Rapid comparison view for nearby options
+
+- **Interactive Map**: Visual venue discovery with safety score markers
+- **Smart Filtering**: Price range, rating, distance, currently open  
+- **Instant Details**: Click venue markers for safety analysis and logistics
+- **Preference Memory**: Budget and safety thresholds automatically applied
 
 ### **Technical Implementation Plan**
 
 **Time Remaining**: ~4-5 hours for both personas
 
 **Tiff (Planner Features)**:
-1. **Calendar Export Component** (2 hours)
-   - Parse chat recommendations into calendar event format
-   - Generate `.ics` files or Google Calendar integration
-   - Include venue details, addresses, reservation links
 
-2. **Itinerary View** (2 hours)  
-   - Timeline/schedule visualization of chat recommendations
-   - Day-by-day breakdown with travel time estimates
-   - Booking status tracking
+1. **Calendar Export Component** (2 hours)
+    - Parse chat recommendations into calendar event format
+    - Generate `.ics` files or Google Calendar integration
+    - Include venue details, addresses, reservation links
+
+2. **Itinerary View** (2 hours)
+    - Timeline/schedule visualization of chat recommendations
+    - Day-by-day breakdown with travel time estimates
+    - Booking status tracking
 
 **Eitan (Explorer Features + User Preferences)**:
+
 1. **Map Integration** (2 hours)
-   - Embed map (Google Maps or Mapbox) 
-   - Plot mock venue locations with safety score markers
-   - Basic zoom/pan functionality
+    - Embed map (Google Maps or Mapbox)
+    - Plot mock venue locations with safety score markers
+    - Click venue markers → show safety analysis details
+    - Basic zoom/pan functionality
 
 2. **Filter Interface** (1.5 hours)
-   - Price range slider (€, €€, €€€)
-   - Rating filter (4+ stars)
-   - Distance radius selector  
-   - "Currently Open" toggle
+    - Price range slider (€, €€, €€€)
+    - Safety score threshold slider (70+, 80+, 90+)
+    - Distance radius selector
+    - "Currently Open" toggle
 
 3. **Persistent User Preferences** (1.5 hours)
-   - Preference panel component (budget, min safety score, dietary restrictions)
-   - localStorage persistence for demo
-   - Auto-apply preferences across chat and map interfaces
-   - "Remember my settings" UX
+    - Preference panel component (budget, min safety score, dietary restrictions)
+    - localStorage persistence for demo
+    - Auto-apply preferences to map filtering (no chat integration needed)
+    - "Remember my settings" UX
 
 **Technical Specification for Preferences**:
+
 ```typescript
 interface UserPreferences {
-  budgetRange: "€" | "€€" | "€€€" | "any"
-  minSafetyScore: number // 70, 80, 90+  
-  dietaryRestrictions: string[] // ["gluten-free", "nut-free"]
-  maxDistance: number // km radius for map
-  openNow: boolean // filter for currently open venues
+    budgetRange: "€" | "€€" | "€€€" | "any";
+    minSafetyScore: number; // 70, 80, 90+
+    dietaryRestrictions: string[]; // ["gluten-free", "nut-free"]
+    maxDistance: number; // km radius for map
+    openNow: boolean; // filter for currently open venues
 }
 ```
 
 **Shared Components**:
-- Both interfaces consume the same mock data
-- Safety scores and venue details consistent across both UX
-- **User preferences apply universally** (chat recommendations + map results)
+
+- Both interfaces consume the same mock data and safety analyzer
+- Safety scores and venue details consistent across both UX  
+- **User preferences storage** (Planner: affects chat, Explorer: affects map filtering)
 - Mobile-responsive design for both personas
 
 ### **Demo Script Enhancement**
@@ -169,14 +180,16 @@ interface UserPreferences {
 "VeganBnB is the first travel AI that adapts to YOUR travel personality. Whether you're a detailed planner who wants calendar events and itineraries, or a spontaneous explorer who discovers through maps and filters, we've got you covered."
 
 **Demo Flow Addition**:
+
 - Show chat interface for initial recommendations
-- **Preferences Demo**: "Let me set my budget preferences as a student" → Set budget €, safety 80+ → "Now watch how the AI remembers this"
+- **Preferences Demo**: "Let me set my budget preferences as a student" → Set budget €, safety 80+ → "Now watch how this applies everywhere"
 - **Planner Demo**: "Export to Calendar" → generates trip timeline (respects preferences)
-- **Explorer Demo**: Switch to map view → preferences auto-applied → real-time discovery
+- **Explorer Demo**: Switch to map view → filtered markers appear → click for instant venue details
 
 **Market Impact**:
+
 - **TAM Expansion**: Addresses different travel behaviors (not just vegan vs non-vegan)
-- **Competitive Moat**: No travel app currently adapts interface to travel personality  
+- **Competitive Moat**: No travel app currently adapts interface to travel personality
 - **Viral Potential**: "Which type of traveler are you?" social media angle
 
 ---
@@ -633,17 +646,20 @@ Format as structured JSON.
 **Frontend Innovation Team (Tiff + Eitan)**:
 
 **Tiff (Planner Persona)**:
-- Calendar export functionality from chat recommendations  
+
+- Calendar export functionality from chat recommendations
 - Itinerary builder with timeline visualization
 - Booking integration and trip execution tools
 - Mobile-responsive planning interface
+- ~~Listings pages (REMOVED - conflicts with persona strategy)~~
 
 **Eitan (Explorer Persona + User Preferences)**:
+
 - Interactive map with venue markers and safety scores
-- Real-time filtering (price, rating, distance, hours)
-- Location-based discovery and "near me" functionality
+- Smart filtering interface (price, safety threshold, distance, hours)
+- Click venue markers for instant safety analysis details
 - **Persistent user preferences system** (budget, safety score, dietary restrictions)
-- Mobile-responsive exploration interface
+- Mobile-responsive exploration interface (no chat integration needed)
 
 **Data Curation Team (Jean-Luc + Felix - Berlin)**:
 
@@ -656,7 +672,7 @@ Format as structured JSON.
 **COMPLETED FOUNDATION**:
 
 - ✅ Category-adaptive analyzer (hero feature)
-- ✅ AI Travel Assistant Chatbot (showstopper feature)  
+- ✅ AI Travel Assistant Chatbot (showstopper feature)
 - ✅ AI-powered quick actions with contextual suggestions
 - ✅ Professional UI with real Berlin venue data
 - ✅ Complete RAG architecture ready for live data integration
