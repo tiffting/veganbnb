@@ -9,6 +9,72 @@ import ReactMarkdown from "react-markdown";
 import UserPreferences, { type UserPreferences as UserPreferencesType } from "@/components/preferences/user-preferences";
 import { generateItineraryFromChat } from "@/lib/sample-itinerary";
 import { downloadIcsFile } from "@/lib/calendar-export";
+import { getListingsByCategory } from "@/lib/mock-data";
+
+// Calendar Export Button Component
+function CalendarExportButton({ messages }: { messages: Message[] }) {
+    const handleExport = () => {
+        const itinerary = generateItineraryFromChat(messages);
+        if (itinerary) {
+            downloadIcsFile(itinerary);
+
+            // Add success message to console (could be a toast in future)
+            console.log(`✅ Calendar export complete! Downloaded: ${itinerary.title}`);
+        } else {
+            console.log("❌ No exportable itinerary found in conversation");
+        }
+    };
+
+    // Check if the last assistant message contains an exportable itinerary
+    const lastAssistantMessage = messages.filter((m) => m.role === "assistant").pop();
+
+    if (!lastAssistantMessage) return null;
+
+    const content = lastAssistantMessage.content.toLowerCase();
+
+    // Look for actual itinerary content (not just recommendations)
+    const hasItinerary =
+        // Must have structured itinerary indicators
+        (content.includes("day 1") ||
+            content.includes("day one") ||
+            content.includes("day 2") ||
+            content.includes("day two") ||
+            (content.includes("morning:") && content.includes("afternoon:")) ||
+            content.includes("itinerary") ||
+            // Or structured timing with multiple days/sessions
+            ((content.includes("9:00") || content.includes("10:00") || content.includes("11:00") || content.includes("12:00")) &&
+             (content.includes("day") || content.includes("morning") || content.includes("afternoon"))) ||
+            // Or clear schedule structure with travel planning
+            (content.includes("schedule") && (content.includes("travel") || content.includes("trip"))))
+        &&
+        // Exclude recommendations and welcome messages
+        !content.includes("here are my top") &&
+        !content.includes("recommendations") &&
+        !content.includes("which city would you like") &&
+        !content.includes("welcome to veganbnb") &&
+        !content.includes("need help planning");
+
+    if (!hasItinerary) return null;
+
+    return (
+        <div className="mt-3 flex justify-start">
+            <button
+                onClick={handleExport}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-blue-700 transition-colors text-sm font-medium"
+            >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                </svg>
+                Export to Calendar
+            </button>
+        </div>
+    );
+}
 
 interface Message {
     id: string;
@@ -38,6 +104,9 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                 const preferences = JSON.parse(savedPreferences);
                 setUserPreferences(preferences);
                 console.log("Loaded existing preferences from localStorage:", preferences);
+            } else {
+                setUserPreferences(null);
+                console.log("No preferences found in localStorage");
             }
         } catch (error) {
             console.error("Failed to load user preferences:", error);
@@ -46,14 +115,10 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
 
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [quickActionSuggestions, setQuickActionSuggestions] = useState<string[]>([]);
-    const [quickActionsLoading, setQuickActionsLoading] = useState(false);
-    const lastGeneratedActionsForMessageId = useRef<string | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const lastUserMessageRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
-    const hasStartedInterview = useRef<boolean>(false);
 
     // Auto-scroll to last user message when new messages arrive (so user can see their question + start of AI response)
     useEffect(() => {
@@ -61,25 +126,6 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
             lastUserMessageRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }, [messages]);
-
-    // Generate quick actions for new assistant messages
-    useEffect(() => {
-        const lastMessage = messages[messages.length - 1];
-
-        // Only generate if we have an assistant message that we haven't generated actions for yet
-        if (lastMessage && lastMessage.role === "assistant" && lastGeneratedActionsForMessageId.current !== lastMessage.id) {
-            // For welcome message (first assistant message with empty history)
-            if (messages.length === 1) {
-                generateQuickActions(lastMessage, []);
-            }
-            // For regular assistant responses (after user messages)
-            else {
-                generateQuickActions(lastMessage, messages.slice(0, -1)); // All messages except the last one
-            }
-
-            lastGeneratedActionsForMessageId.current = lastMessage.id;
-        }
-    }, [messages]); // Only depend on messages, but use ref to prevent duplicate generation
 
     const sendMessage = useCallback(
         async (messageText?: string) => {
@@ -101,7 +147,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                     content: `**🔍 Debug Info:**\n\n**User Preferences Status:** ${userPreferences ? "✅ Loaded" : "❌ Not loaded"}\n\n${userPreferences ? `**Current Preferences:**\n\`\`\`json\n${JSON.stringify(userPreferences, null, 2)}\n\`\`\`` : "**localStorage data:** " + localStorage.getItem("veganbnb-user-preferences")}\n\n**How to verify AI sees them:** Check browser console for AI provider messages when you send a regular message.`,
                     timestamp: new Date(),
                 };
-                
+
                 setMessages((prev) => [...prev, userMessage, debugMessage]);
                 setInput(""); // Clear the input
                 return;
@@ -117,11 +163,6 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
             setMessages((prev) => [...prev, userMessage]);
             setInput("");
             setIsLoading(true);
-
-            // Clear quick actions immediately when user sends a message
-            setQuickActionSuggestions([]);
-            // Reset the tracking ref so stale actions don't reappear
-            lastGeneratedActionsForMessageId.current = null;
 
             // Scroll to user message after sending (will be the last user message)
             setTimeout(() => {
@@ -221,112 +262,19 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
         [input, isLoading, messages, userPreferences],
     );
 
-    // Auto-start interview on first load
+    // Welcome message for first-time users (after onboarding)
     useEffect(() => {
-        if (messages.length === 0 && !hasStartedInterview.current) {
-            hasStartedInterview.current = true;
-            // Send an initial message to trigger the smart interview (hidden from UI)
-            sendMessage("__AUTO_START__");
+        if (messages.length === 0 && userPreferences) {
+            // Send a welcome message now that onboarding is complete
+            const welcomeMessage: Message = {
+                id: `welcome-${Date.now()}`,
+                role: "assistant",
+                content: `Welcome to VeganBnB! I see you've completed your preferences. I have comprehensive data for **Berlin** with 32 food venues (restaurants, cafes, bars, ice cream), ${getListingsByCategory("accommodation").length} accommodations, ${getListingsByCategory("tour").length} tours, and ${getListingsByCategory("event").length} events.\n\nWhich city would you like to explore for your ${userPreferences.tripPreferences?.planningStyle === "structured" ? "structured itinerary planning" : "flexible travel exploration"}?`,
+                timestamp: new Date(),
+            };
+            setMessages([welcomeMessage]);
         }
-    }, [messages.length, sendMessage]); // Include all dependencies
-
-    const generateQuickActions = async (lastMessage: Message, conversationHistory: Message[]) => {
-        setQuickActionsLoading(true);
-        try {
-            const response = await fetch("/api/quick-actions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    lastMessage: lastMessage,
-                    conversationHistory: conversationHistory.slice(-5), // Send last 5 messages for context
-                }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setQuickActionSuggestions(data.suggestions || []);
-            } else {
-                // Fallback to context-aware suggestions on API error
-                const content = lastMessage.content.toLowerCase();
-                let suggestions;
-
-                if (content.includes("which city") || content.includes("planning to visit")) {
-                    suggestions = ["Berlin", "London", "Amsterdam", "Barcelona"];
-                } else if (content.includes("restaurant") || content.includes("dining")) {
-                    suggestions = ["What about accommodations?", "Any nearby hotels?", "Show me food tours", "I'm also gluten-free"];
-                } else {
-                    suggestions = ["Tell me more about this", "What else do you recommend?", "Any budget-friendly options?", "Plan my complete itinerary"];
-                }
-
-                setQuickActionSuggestions(suggestions);
-            }
-        } catch (error) {
-            console.error("Quick actions error:", error);
-            // Fallback suggestions with context awareness
-            const content = lastMessage.content.toLowerCase();
-            let suggestions;
-
-            if (content.includes("which city") || content.includes("planning to visit")) {
-                suggestions = ["Berlin", "London", "Amsterdam", "Barcelona"];
-            } else if (content.includes("restaurant") || content.includes("dining")) {
-                suggestions = ["What about accommodations?", "Any nearby hotels?", "Show me food tours", "I'm also gluten-free"];
-            } else {
-                suggestions = ["Tell me more about this", "What else do you recommend?", "Any budget-friendly options?", "Plan my complete itinerary"];
-            }
-
-            setQuickActionSuggestions(suggestions);
-        } finally {
-            setQuickActionsLoading(false);
-        }
-    };
-
-    const handleQuickActionClick = (suggestion: string) => {
-        // Handle special calendar export action
-        if (suggestion === "📅 Export to Calendar") {
-            const itinerary = generateItineraryFromChat(messages);
-            if (itinerary) {
-                downloadIcsFile(itinerary);
-
-                // Add confirmation message to chat
-                const confirmationMessage: Message = {
-                    id: Date.now().toString(),
-                    role: "assistant",
-                    content: `✅ **Calendar export complete!**
-
-Your ${itinerary.title} has been downloaded as a calendar file. You can now import it into your preferred calendar app:
-
-- **Apple Calendar**: Double-click the .ics file
-- **Google Calendar**: Go to Settings > Import & Export > Import
-- **Outlook**: File > Open & Export > Import/Export
-
-The calendar includes all venues, transit times, and booking details for your trip! 🎉`,
-                    timestamp: new Date(),
-                    metadata: {
-                        categories: ["calendar_export"],
-                    },
-                };
-
-                setMessages((prev) => [...prev, confirmationMessage]);
-            } else {
-                // Fallback if no itinerary could be generated
-                const errorMessage: Message = {
-                    id: Date.now().toString(),
-                    role: "assistant",
-                    content:
-                        "I need more trip details to create a calendar export. Could you tell me more about your travel plans, including dates and specific venues you'd like to visit?",
-                    timestamp: new Date(),
-                };
-
-                setMessages((prev) => [...prev, errorMessage]);
-            }
-            return;
-        }
-
-        // Send regular suggestions as messages
-        sendMessage(suggestion);
-    };
+    }, [messages.length, userPreferences]); // Include all dependencies
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleTimeString("en-US", {
@@ -392,17 +340,17 @@ The calendar includes all venues, transit times, and booking details for your tr
     return (
         <div className={`flex flex-col h-full max-w-4xl mx-auto ${className}`}>
             {/* Header */}
-            <div className="border-b bg-white p-4">
+            <div className="border-b bg-white px-3 py-2 sm:p-4">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Avatar>
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                        <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
                             <AvatarFallback className="bg-green-500 text-white">
-                                <Bot className="w-5 h-5" />
+                                <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
                             </AvatarFallback>
                         </Avatar>
-                        <div>
-                            <h2 className="font-semibold text-lg">VeganBnB Travel Assistant</h2>
-                            <p className="text-sm text-gray-600">Your AI guide for complete vegan travel planning</p>
+                        <div className="min-w-0 flex-1">
+                            <h2 className="font-semibold text-sm sm:text-lg truncate">VeganBnB</h2>
+                            <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Your AI guide for complete vegan travel planning</p>
                         </div>
                     </div>
 
@@ -418,8 +366,8 @@ The calendar includes all venues, transit times, and booking details for your tr
 
             {/* Preferences Banner */}
             {userPreferences && (
-                <div className="bg-green-50 border-b border-green-200 px-4 py-2">
-                    <div className="flex items-center justify-between text-sm">
+                <div className="bg-green-50 border-b border-green-200 px-3 py-2 sm:px-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm gap-1 sm:gap-0">
                         <span className="text-green-800">
                             <strong>Preferences active:</strong>{" "}
                             {(() => {
@@ -485,74 +433,42 @@ The calendar includes all venues, transit times, and booking details for your tr
                                 return prefs.length > 0 ? prefs.join(" • ") : "Default settings";
                             })()}
                         </span>
-                        <span className="text-green-600 text-xs">Personalizing recommendations</span>
+                        <span className="text-green-600 text-xs hidden sm:block">Personalizing recommendations</span>
                     </div>
                 </div>
             )}
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+            <ScrollArea className="flex-1 px-3 py-4 sm:p-4" ref={scrollAreaRef}>
                 <div className="space-y-4">
-                    {messages
-                        .filter((msg) => msg.content !== "__AUTO_START__")
-                        .map((message, index, filteredMessages) => {
-                            // Find the last user message for scroll targeting
-                            const allMessagesAfterThis = messages.slice(messages.indexOf(message) + 1);
-                            const isLastUserMessage = message.role === "user" && !allMessagesAfterThis.some((m) => m.role === "user");
+                    {messages.map((message, index, filteredMessages) => {
+                        // Find the last user message for scroll targeting
+                        const allMessagesAfterThis = messages.slice(messages.indexOf(message) + 1);
+                        const isLastUserMessage = message.role === "user" && !allMessagesAfterThis.some((m) => m.role === "user");
 
-                            // Check if this is the last assistant message for quick actions (use filtered array length)
-                            const isLastAssistantMessage = message.role === "assistant" && index === filteredMessages.length - 1 && !isLoading;
+                        return (
+                            <div key={message.id}>
+                                <div ref={isLastUserMessage ? lastUserMessageRef : null} className={`flex gap-3 ${getFlexDirection(message.role)}`}>
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarFallback className={getAvatarColor(message.role)}>
+                                            {message.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                                        </AvatarFallback>
+                                    </Avatar>
 
-                            return (
-                                <div key={message.id}>
-                                    <div ref={isLastUserMessage ? lastUserMessageRef : null} className={`flex gap-3 ${getFlexDirection(message.role)}`}>
-                                        <Avatar className="w-8 h-8">
-                                            <AvatarFallback className={getAvatarColor(message.role)}>
-                                                {message.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                                            </AvatarFallback>
-                                        </Avatar>
-
-                                        <div className={`flex-1 max-w-[80%] ${getUserTextAlign(message.role)}`}>
-                                            <div className={`rounded-lg p-3 ${getBubbleColor(message.role)}`}>
-                                                <MessageContent message={message} />
-                                            </div>
-
-                                            <div className={`mt-1 text-xs text-gray-500 ${getUserTextAlign(message.role)}`}>{formatTimestamp(message.timestamp)}</div>
+                                    <div className={`flex-1 max-w-[80%] ${getUserTextAlign(message.role)}`}>
+                                        <div className={`rounded-lg p-3 ${getBubbleColor(message.role)}`}>
+                                            <MessageContent message={message} />
                                         </div>
+
+                                        <div className={`mt-1 text-xs text-gray-500 ${getUserTextAlign(message.role)}`}>{formatTimestamp(message.timestamp)}</div>
                                     </div>
-
-                                    {/* AI-powered quick actions after last assistant message */}
-                                    {isLastAssistantMessage && (quickActionSuggestions.length > 0 || quickActionsLoading) && (
-                                        <div className="mt-3 mb-4">
-                                            {quickActionsLoading ? (
-                                                <div className="flex gap-2">
-                                                    <div className="h-7 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                                                    <div className="h-7 w-20 bg-gray-200 rounded-full animate-pulse"></div>
-                                                    <div className="h-7 w-18 bg-gray-200 rounded-full animate-pulse"></div>
-                                                    <div className="h-7 w-22 bg-gray-200 rounded-full animate-pulse"></div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {quickActionSuggestions.map((suggestion, index) => (
-                                                        <button
-                                                            key={`${suggestion}-${index}`}
-                                                            onClick={() => {
-                                                                // Send message directly with the suggestion text
-                                                                handleQuickActionClick(suggestion);
-                                                            }}
-                                                            className="text-sm bg-green-50 hover:bg-green-100 border border-green-200 rounded-full px-3 py-1.5 text-green-700 transition-colors"
-                                                            disabled={isLoading}
-                                                        >
-                                                            {suggestion}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
                                 </div>
-                            );
-                        })}
+
+                                {/* Calendar Export Button for itineraries */}
+                                {message.role === "assistant" && index === filteredMessages.length - 1 && <CalendarExportButton messages={messages} />}
+                            </div>
+                        );
+                    })}
 
                     {isLoading && (
                         <div className="flex gap-3">
@@ -579,7 +495,7 @@ The calendar includes all venues, transit times, and booking details for your tr
             </ScrollArea>
 
             {/* Input */}
-            <div className="border-t bg-white p-4">
+            <div className="border-t bg-white p-3 sm:p-4 pb-safe">
                 <div className="flex gap-2 items-end">
                     <textarea
                         ref={inputRef}
@@ -591,12 +507,13 @@ The calendar includes all venues, transit times, and booking details for your tr
                                 sendMessage();
                             }
                         }}
-                        placeholder="Ask me about vegan travel anywhere... (Shift+Enter for new line)"
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent min-h-10 max-h-[120px]"
+                        placeholder="Ask about vegan travel..."
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent min-h-11 max-h-[120px]"
                         disabled={isLoading}
                         rows={1}
                         style={{
                             height: "auto",
+                            fontSize: "16px",
                             overflowY: input.split("\n").length > 3 ? "scroll" : "hidden",
                         }}
                         onInput={(e) => {
@@ -605,7 +522,7 @@ The calendar includes all venues, transit times, and booking details for your tr
                             target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
                         }}
                     />
-                    <Button onClick={() => sendMessage()} disabled={!input.trim() || isLoading} className="bg-green-500 hover:bg-green-600 mb-0.5">
+                    <Button onClick={() => sendMessage()} disabled={!input.trim() || isLoading} className="bg-green-500 hover:bg-green-600 min-h-11 px-3">
                         <Send className="w-4 h-4" />
                     </Button>
                 </div>
