@@ -6,7 +6,15 @@
 
 ```bash
 # .env.local
-GEMINI_API_KEY=your_key_here
+
+# AI Provider Configuration (choose one)
+AI_PROVIDER=openrouter  # Options: openrouter (default), openai, gemini
+
+# API Keys - only need the key for your chosen provider
+OPENROUTER_API_KEY=your_openrouter_api_key  # For OpenRouter (default)
+OPENAI_API_KEY=your_openai_api_key          # For OpenAI GPT-4o-mini
+GEMINI_API_KEY=your_gemini_api_key          # For Google Gemini
+
 # Firebase & Maps APIs added later
 ```
 
@@ -17,11 +25,46 @@ npm run dev              # Development server
 npm run build && npm run lint  # Pre-push check
 npx tsc --noEmit         # TypeScript check
 
-# Test Gemini API
-node tests/test-gemini.js
+# Test current AI configuration
+node tests/test-ai-config.js
 ```
 
-**Model**: `gemini-2.5-flash` | **Cost**: ~$0.80 for demo
+### AI Provider Configuration
+
+VeganBnB uses a centralized AI configuration system (`lib/ai-config.js`) that supports multiple providers:
+
+#### Available Providers:
+
+1. **OpenRouter** (default)
+   - Model: `microsoft/wizardlm-2-8x22b`
+   - Stability: High
+   - Cost: Moderate
+   - Good for: Production use, reliable responses
+
+2. **OpenAI** 
+   - Model: `gpt-4o-mini`
+   - Speed: Very fast
+   - Cost: Low (~$0.15 per 1M tokens)
+   - Good for: Quick responses, cost-effective production
+
+3. **Google Gemini**
+   - Model: `gemini-1.5-flash`
+   - Speed: Fast
+   - Cost: Low (~$0.075 per 1M tokens)
+   - Good for: Development, testing
+
+#### Switching Providers:
+
+Simply change `AI_PROVIDER` in `.env.local` and restart the dev server:
+```bash
+AI_PROVIDER=openai     # Switch to OpenAI
+AI_PROVIDER=gemini     # Switch to Gemini
+AI_PROVIDER=openrouter # Back to default
+```
+
+#### Cost Estimates:
+- Demo usage (40 listings): ~$0.50-$1.00
+- Production (1000 queries/day): ~$5-15/day depending on provider
 
 ## Development Workflow
 
@@ -61,8 +104,8 @@ components/
 lib/
 ├── types.ts     # Shared types
 ├── mock-data.js # Shared test data
-├── gemini.js    # Prudhvi - AI client
-└── firebase.js  # Prudhvi - database
+├── prompts.js   # AI agent prompts
+└── firebase.js  # Database for storing venues
 ```
 
 ### Development Principles
@@ -140,24 +183,28 @@ const mockData = { ... }
 ## Data Curation Team Guide (Jean-Luc, Felix)
 
 ### **Available APIs from Organizers**
-- **ScrapingDog**: Web scraping for reviews and venue details  
+
+- **ScrapingDog**: Web scraping for reviews and venue details
 - **OpenRouter**: Access to multiple LLM models for data processing
 - **Potentially**: Google Places API, other APIs Sam can provide
 
 ### **Target Data Sources**
+
 - **HappyCow**: Restaurant data and reviews
 - **Google Places**: Hours, contact info, basic details
-- **TripAdvisor**: Tour and accommodation reviews  
+- **TripAdvisor**: Tour and accommodation reviews
 - **Booking.com/Airbnb**: Accommodation availability and pricing
 - **Eventbrite/Facebook Events**: Event listings and schedules
 
 ### **Integration Points**
+
 - **Current mock data** in `lib/mock-data.js` - shows expected data structure
 - **API routes** in `app/api/` - modify to fetch live data instead of mock
 - **Safety score analyzer** in `app/api/analyze/route.js` - ready for real reviews
 - **Database schema** - Firebase Firestore already set up for live data
 
-### **Development Workflow**  
+### **Development Workflow**
+
 ```bash
 git checkout -b feature/external-data-sources
 # Work on data integrations
@@ -166,6 +213,7 @@ git checkout -b feature/external-data-sources
 ```
 
 **ACTIONABLE LOGISTICS FEATURES**:
+
 - ✅ eSIM-friendly booking methods (online/email priority, no phone required)
 - ✅ Complete operational details (hours, pricing, schedules, transit)
 - ✅ Language barrier solutions (English booking platforms highlighted)

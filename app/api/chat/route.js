@@ -1,11 +1,5 @@
-import OpenAI from 'openai';
+import { getAICompletion, getAIProviderInfo } from "../../../lib/ai-config.js";
 import { mockListings, getListingsByCategory, getHighScoringListings } from "../../../lib/mock-data.js";
-
-// Use OpenRouter for reliable AI access
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
-});
 
 export async function POST(request) {
   try {
@@ -38,28 +32,20 @@ export async function POST(request) {
     // Build conversation prompt with context injection
     const prompt = buildChatPrompt(message, chatHistory, context);
     
-    // Try OpenAI API first, fallback to hardcoded responses for development
+    // Try AI API first, fallback to hardcoded responses for development
     let text;
     try {
-      const completion = await openai.chat.completions.create({
-        model: "microsoft/wizardlm-2-8x22b",
-        messages: [
-          {
-            role: "system",
-            content: "You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events."
-          },
-          {
-            role: "user", 
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
+      const aiInfo = getAIProviderInfo();
+      console.log(`Using ${aiInfo.provider} (${aiInfo.model}) for chat completion`);
+      
+      text = await getAICompletion({
+        systemPrompt: "You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events.",
+        userPrompt: prompt,
+        maxTokens: 1000,
         temperature: 0.7,
       });
-      
-      text = completion.choices[0].message.content;
-    } catch {
-      console.log('OpenAI API unavailable, using fallback response');
+    } catch (error) {
+      console.log('AI API unavailable, using fallback response:', error.message);
       // Fallback to hardcoded responses for development
       text = generateFallbackResponse(message, chatHistory);
     }

@@ -20,9 +20,14 @@ Next.js 15 + TypeScript + Tailwind + OpenRouter AI + Firebase
 ### Environment Variables
 Create `.env.local` with:
 ```
+# AI Provider Configuration
+AI_PROVIDER=openrouter  # Options: openrouter (default), openai, gemini
+
+# API Keys (only need the key for your chosen provider)
 OPENROUTER_API_KEY=your_openrouter_api_key
-OPENAI_API_KEY=your_openai_api_key  # (backup)
-GEMINI_API_KEY=your_google_gemini_api_key  # (backup)
+OPENAI_API_KEY=your_openai_api_key  
+GEMINI_API_KEY=your_google_gemini_api_key
+
 # Firebase config ✅ 
 # Maps API key (to be added)
 ```
@@ -38,6 +43,26 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## AI Configuration
+
+VeganBnB supports multiple AI providers for flexibility and reliability:
+
+- **OpenRouter** (default) - Stable, reliable, uses WizardLM-2-8x22b model
+- **OpenAI** - Fast and cost-effective with GPT-4o-mini
+- **Google Gemini** - Uses gemini-1.5-flash for good performance
+
+To switch providers, simply update `AI_PROVIDER` in `.env.local`:
+```bash
+AI_PROVIDER=openai     # Use OpenAI GPT-4o-mini
+AI_PROVIDER=gemini     # Use Google Gemini
+AI_PROVIDER=openrouter # Use OpenRouter (default)
+```
+
+Test your configuration:
+```bash
+node tests/test-ai-config.js
+```
 
 ## Current Status
 
@@ -61,13 +86,12 @@ npm run dev       # Development server
 npm run lint      # Code quality check
 npm run build     # Production build test
 
-# Test OpenRouter AI (primary)
+# Test AI configuration (checks current provider)
+node tests/test-ai-config.js
+
+# Legacy individual provider tests (optional)
 node tests/test-openrouter.js
-
-# Test OpenAI API (backup)
 node tests/test-openai.js
-
-# Test Gemini API (backup)
 node tests/test-gemini.js
 ```
 

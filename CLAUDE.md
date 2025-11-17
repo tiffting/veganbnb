@@ -19,13 +19,13 @@ This ensures documentation stays current across all AI sessions.
 
 ## Current Project State (IMPORTANT: Update this as you go for cross-session continuity)
 
-**Last Updated**: Nov 16, 2025 1:30pm CET (Smart Interview Process Complete - Production Ready)
+**Last Updated**: Nov 17, 2024 (AI Provider System + Documentation Updates)
 
 **What's Implemented**:
 
 - ✅ Next.js 15 project with TypeScript (strict mode)
 - ✅ ESM modules (`"type": "module"` in package.json)
-- ✅ Google Gemini API integration working (`gemini-2.5-flash`)
+- ✅ Multi-provider AI system (OpenRouter default, OpenAI, Gemini) via `lib/ai-config.js`
 - ✅ Firebase setup complete (Auth + Firestore, tested)
 - ✅ TypeScript interfaces complete (`lib/types.ts` with all core types)
 - ✅ Category-adaptive analyzer complete (API + prompts + validation + testing)
@@ -535,7 +535,9 @@ interface Listing {
 ### Tech Stack
 
 - **Frontend**: Next.js 15 + TypeScript + Tailwind + Shadcn/UI
-- **AI**: Google Gemini API (`gemini-2.5-flash`)
+- **AI**: Flexible provider system - OpenRouter (default), OpenAI, or Google Gemini
+  - Configured via `AI_PROVIDER` environment variable
+  - Centralized configuration in `lib/ai-config.js`
 - **Database**: Firebase (Firestore + Auth)
 - **Deploy**: Vercel
 - **Optional**: GPT-4 Vision (menu translation)
@@ -760,7 +762,7 @@ _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 **Technical Setup (Completed by Tiff):**
 
 1. GitHub repo + Next.js boilerplate with category structure ✅
-2. OpenRouter AI integration with fallback system ✅  
+2. Multi-provider AI system (OpenRouter/OpenAI/Gemini) with fallback ✅  
 3. Smart interview process with preferences ✅
 4. Professional chat interface with quick actions ✅
 5. Estimate API costs (should be <$10 for demo) ✅

@@ -1,11 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getAICompletion, getAIProviderInfo } from "../../../lib/ai-config.js";
 import { CATEGORY_PROMPTS } from "../../../lib/prompts";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config({ path: ".env.local" });
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Valid categories for validation
 const VALID_CATEGORIES = ['restaurant', 'accommodation', 'tour', 'event'];
@@ -29,25 +27,47 @@ export async function POST(req) {
             );
         }
 
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json",
-                temperature: 0.7,
-            },
+        // Get AI provider info for logging
+        const aiInfo = getAIProviderInfo();
+        console.log(`Using ${aiInfo.provider} (${aiInfo.model}) for review analysis`);
+
+        // Build the analysis prompt
+        const reviewPrompt = CATEGORY_PROMPTS[category](reviews);
+        
+        // Add JSON formatting instruction to the system prompt
+        const systemPrompt = `You are a vegan travel safety analyzer. Analyze reviews and return a JSON response.
+        
+IMPORTANT: Return ONLY valid JSON without any markdown formatting or code blocks. The response should be parseable by JSON.parse().
+
+Expected JSON structure:
+{
+  "score": number (0-100),
+  "category": string,
+  "reasoning": string,
+  "signals": object with category-specific scores,
+  "citations": array of relevant quotes
+}`;
+
+        // Get AI completion
+        const responseText = await getAICompletion({
+            systemPrompt: systemPrompt,
+            userPrompt: reviewPrompt,
+            maxTokens: 800,
+            temperature: 0.7
         });
 
-        const prompt = CATEGORY_PROMPTS[category](reviews);
-        const result = await model.generateContent(prompt);
-
-        let responseText = result.response.text();
-        // Strip markdown if Gemini adds it
-        responseText = responseText
+        // Clean up response and parse JSON
+        let cleanedResponse = responseText
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
+            
+        // If response starts/ends with backticks, remove them
+        if (cleanedResponse.startsWith('`')) {
+            cleanedResponse = cleanedResponse.replace(/^`+|`+$/g, '');
+        }
 
-        const analysis = JSON.parse(responseText);
+        const analysis = JSON.parse(cleanedResponse);
         
         // Validate response structure
         if (!analysis.score || !analysis.category || !analysis.signals || !analysis.citations) {
