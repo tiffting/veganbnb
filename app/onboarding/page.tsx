@@ -144,9 +144,8 @@ function OnboardingContent() {
         if (persona === "structured") {
             router.push("/chat");
         } else {
-            // For now, redirect to chat with a note about map coming soon
-            // In the future, this would go to /map
-            router.push("/chat");
+            // Flexible users get the map interface
+            router.push("/map");
         }
     };
 
@@ -181,7 +180,7 @@ function OnboardingContent() {
         if (selectedPersona === "structured") {
             router.push("/chat");
         } else {
-            router.push("/chat");
+            router.push("/map");
         }
     };
 

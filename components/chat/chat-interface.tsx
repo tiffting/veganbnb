@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ReactMarkdown from "react-markdown";
-import UserPreferences, { type UserPreferences as UserPreferencesType } from "@/components/preferences/user-preferences";
+import TravelSettings, { type TravelSettings as TravelSettingsType } from "@/components/settings/travel-settings";
 import { generateItineraryFromChat } from "@/lib/sample-itinerary";
 import { downloadIcsFile } from "@/lib/calendar-export";
 import { getListingsByCategory } from "@/lib/mock-data";
@@ -94,22 +94,22 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ initialMessages = [], className }: ChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
-    const [userPreferences, setUserPreferences] = useState<UserPreferencesType | null>(null);
+    const [userSettings, setUserSettings] = useState<TravelSettingsType | null>(null);
 
-    // Load user preferences from localStorage on startup
+    // Load user settings from localStorage on startup
     useEffect(() => {
         try {
-            const savedPreferences = localStorage.getItem("veganbnb-user-preferences");
-            if (savedPreferences) {
-                const preferences = JSON.parse(savedPreferences);
-                setUserPreferences(preferences);
-                console.log("Loaded existing preferences from localStorage:", preferences);
+            const savedSettings = localStorage.getItem("veganbnb-user-preferences");
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                setUserSettings(settings);
+                console.log("Loaded existing settings from localStorage:", settings);
             } else {
-                setUserPreferences(null);
-                console.log("No preferences found in localStorage");
+                setUserSettings(null);
+                console.log("No settings found in localStorage");
             }
         } catch (error) {
-            console.error("Failed to load user preferences:", error);
+            console.error("Failed to load user settings:", error);
         }
     }, []);
 
@@ -144,7 +144,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                 const debugMessage: Message = {
                     id: `debug-${Date.now() + 1}`,
                     role: "assistant",
-                    content: `**🔍 Debug Info:**\n\n**User Preferences Status:** ${userPreferences ? "✅ Loaded" : "❌ Not loaded"}\n\n${userPreferences ? `**Current Preferences:**\n\`\`\`json\n${JSON.stringify(userPreferences, null, 2)}\n\`\`\`` : "**localStorage data:** " + localStorage.getItem("veganbnb-user-preferences")}\n\n**How to verify AI sees them:** Check browser console for AI provider messages when you send a regular message.`,
+                    content: `**🔍 Debug Info:**\n\n**User Settings Status:** ${userSettings ? "✅ Loaded" : "❌ Not loaded"}\n\n${userSettings ? `**Current Settings:**\n\`\`\`json\n${JSON.stringify(userSettings, null, 2)}\n\`\`\`` : "**localStorage data:** " + localStorage.getItem("veganbnb-user-preferences")}\n\n**How to verify AI sees them:** Check browser console for AI provider messages when you send a regular message.`,
                     timestamp: new Date(),
                 };
 
@@ -180,7 +180,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                     body: JSON.stringify({
                         message: text,
                         chatHistory: messages.slice(-5), // Send last 5 messages for context
-                        userPreferences: userPreferences, // Send user preferences for AI context
+                        userPreferences: userSettings, // Send user settings for AI context
                     }),
                 });
 
@@ -214,8 +214,8 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                         dietaryRestrictions: data.metadata.finalPreferences.dietaryRestrictions,
                     });
 
-                    // Convert interview responses to user preferences format
-                    const preferences: UserPreferencesType = {
+                    // Convert interview responses to user settings format
+                    const settings: TravelSettingsType = {
                         budgetRange: data.metadata.finalPreferences.budgetRange || "any",
                         minSafetyScore: 70, // Default safe minimum
                         dietaryRestrictions: data.metadata.finalPreferences.dietaryRestrictions || [],
@@ -241,10 +241,10 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                     };
 
                     // Save to localStorage and update state
-                    localStorage.setItem("veganbnb-user-preferences", JSON.stringify(preferences));
-                    setUserPreferences(preferences);
+                    localStorage.setItem("veganbnb-user-preferences", JSON.stringify(settings));
+                    setUserSettings(settings);
 
-                    console.log("Preferences auto-saved from interview:", preferences);
+                    console.log("Settings auto-saved from interview:", settings);
                 }
             } catch (error) {
                 console.error("Chat error:", error);
@@ -259,22 +259,22 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                 setIsLoading(false);
             }
         },
-        [input, isLoading, messages, userPreferences],
+        [input, isLoading, messages, userSettings],
     );
 
     // Welcome message for first-time users (after onboarding)
     useEffect(() => {
-        if (messages.length === 0 && userPreferences) {
+        if (messages.length === 0 && userSettings) {
             // Send a welcome message now that onboarding is complete
             const welcomeMessage: Message = {
                 id: `welcome-${Date.now()}`,
                 role: "assistant",
-                content: `Welcome to VeganBnB! I see you've completed your preferences. I have comprehensive data for **Berlin** with 32 food venues (restaurants, cafes, bars, ice cream), ${getListingsByCategory("accommodation").length} accommodations, ${getListingsByCategory("tour").length} tours, and ${getListingsByCategory("event").length} events.\n\nWhich city would you like to explore for your ${userPreferences.tripPreferences?.planningStyle === "structured" ? "structured itinerary planning" : "flexible travel exploration"}?`,
+                content: `Welcome to VeganBnB! I see you've completed your preferences. I have comprehensive data for **Berlin** with 32 food venues (restaurants, cafes, bars, ice cream), ${getListingsByCategory("accommodation").length} accommodations, ${getListingsByCategory("tour").length} tours, and ${getListingsByCategory("event").length} events.\n\nWhich city would you like to explore for your ${userSettings.tripPreferences?.planningStyle === "structured" ? "structured itinerary planning" : "flexible travel exploration"}?`,
                 timestamp: new Date(),
             };
             setMessages([welcomeMessage]);
         }
-    }, [messages.length, userPreferences]); // Include all dependencies
+    }, [messages.length, userSettings]); // Include all dependencies
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleTimeString("en-US", {
@@ -354,47 +354,42 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                         </div>
                     </div>
 
-                    {/* Preferences Button with Status Indicator */}
-                    <div className="relative">
-                        <UserPreferences onPreferencesChange={setUserPreferences} />
-                        {userPreferences && (
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full" title="Preferences saved" />
-                        )}
-                    </div>
+                    {/* Travel Settings Button */}
+                    <TravelSettings onSettingsChange={setUserSettings} />
                 </div>
             </div>
 
-            {/* Preferences Banner */}
-            {userPreferences && (
+            {/* Settings Banner */}
+            {userSettings && (
                 <div className="bg-green-50 border-b border-green-200 px-3 py-2 sm:px-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm gap-1 sm:gap-0">
                         <span className="text-green-800">
-                            <strong>Preferences active:</strong>{" "}
+                            <strong>Settings active:</strong>{" "}
                             {(() => {
-                                const prefs = [];
+                                const settings = [];
 
                                 // Budget
-                                if (userPreferences.budgetRange !== "any") {
-                                    prefs.push(`${userPreferences.budgetRange} budget`);
+                                if (userSettings.budgetRange !== "any") {
+                                    settings.push(`${userSettings.budgetRange} budget`);
                                 }
 
                                 // Safety score
-                                if (userPreferences.minSafetyScore > 70) {
-                                    prefs.push(`${userPreferences.minSafetyScore}+ safety`);
+                                if (userSettings.minSafetyScore > 70) {
+                                    settings.push(`${userSettings.minSafetyScore}+ safety`);
                                 }
 
                                 // Eating style
-                                if (userPreferences.eatingPreferences?.style && userPreferences.eatingPreferences.style !== "casual") {
-                                    prefs.push(`${userPreferences.eatingPreferences.style} dining`);
+                                if (userSettings.eatingPreferences?.style && userSettings.eatingPreferences.style !== "casual") {
+                                    settings.push(`${userSettings.eatingPreferences.style} dining`);
                                 }
 
                                 // Planning style
-                                if (userPreferences.tripPreferences?.planningStyle && userPreferences.tripPreferences.planningStyle !== "flexible") {
-                                    prefs.push(`${userPreferences.tripPreferences.planningStyle} planning`);
+                                if (userSettings.tripPreferences?.planningStyle && userSettings.tripPreferences.planningStyle !== "flexible") {
+                                    settings.push(`${userSettings.tripPreferences.planningStyle} planning`);
                                 }
 
                                 // Transport modes (show if not default walking + public transit)
-                                const transportModes = userPreferences.mobilityPreferences?.transportModes || [];
+                                const transportModes = userSettings.mobilityPreferences?.transportModes || [];
                                 if (
                                     transportModes.length > 0 &&
                                     !(transportModes.length === 2 && transportModes.includes("walking") && transportModes.includes("public_transit"))
@@ -411,26 +406,26 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                                                 return mode;
                                         }
                                     });
-                                    prefs.push(humanFriendlyModes.join(" + "));
+                                    settings.push(humanFriendlyModes.join(" + "));
                                 }
 
                                 // Dietary restrictions
-                                if (userPreferences.dietaryRestrictions?.length > 0) {
-                                    prefs.push(userPreferences.dietaryRestrictions.join(", "));
+                                if (userSettings.dietaryRestrictions?.length > 0) {
+                                    settings.push(userSettings.dietaryRestrictions.join(", "));
                                 }
 
                                 // Travel dates (format nicely)
-                                if (userPreferences.tripPreferences?.travelDates) {
-                                    const dates = userPreferences.tripPreferences.travelDates;
+                                if (userSettings.tripPreferences?.travelDates) {
+                                    const dates = userSettings.tripPreferences.travelDates;
                                     // Convert formats like "19-21 nov" to "19-21 Nov"
                                     const formattedDates = dates.replace(
                                         /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/gi,
                                         (match) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase(),
                                     );
-                                    prefs.push(formattedDates);
+                                    settings.push(formattedDates);
                                 }
 
-                                return prefs.length > 0 ? prefs.join(" • ") : "Default settings";
+                                return settings.length > 0 ? settings.join(" • ") : "Default settings";
                             })()}
                         </span>
                         <span className="text-green-600 text-xs hidden sm:block">Personalizing recommendations</span>
