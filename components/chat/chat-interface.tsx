@@ -127,6 +127,11 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
         }
     }, [messages]);
 
+    // Autofocus the input field on mount
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
     const sendMessage = useCallback(
         async (messageText?: string) => {
             const text = messageText || input.trim();
@@ -184,11 +189,29 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                     }),
                 });
 
+                const data = await response.json();
+
+                // Check for rate limit error
+                if (!response.ok && data.error === "rate_limit") {
+                    // Create a special rate limit message
+                    const rateLimitMessage: Message = {
+                        id: `ratelimit-${Date.now()}`,
+                        role: "assistant",
+                        content: `⚠️ **${data.message}**\n\n${data.fallbackResponse || "I can still help with basic questions about vegan travel in Berlin!"}\n\n${data.devModeSuggestions ? `💡 **Developer Tip:**\n\n${data.devModeSuggestions}` : ""}`,
+                        timestamp: new Date(),
+                        metadata: {
+                            isRateLimitError: true,
+                            ...data.metadata
+                        },
+                    };
+                    
+                    setMessages((prev) => [...prev, rateLimitMessage]);
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error("Failed to get response");
                 }
-
-                const data = await response.json();
 
                 const assistantMessage: Message = {
                     id: `assistant-${Date.now()}`,
@@ -257,6 +280,10 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                 setMessages((prev) => [...prev, errorMessage]);
             } finally {
                 setIsLoading(false);
+                // Refocus input after message is processed
+                setTimeout(() => {
+                    inputRef.current?.focus();
+                }, 100);
             }
         },
         [input, isLoading, messages, userSettings],

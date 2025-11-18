@@ -36,26 +36,28 @@ VeganBnB uses a centralized AI configuration system (`lib/ai-config.js`) that su
 #### Available Providers:
 
 1. **OpenRouter** (default)
-   - Model: `microsoft/wizardlm-2-8x22b`
-   - Stability: High
-   - Cost: Moderate
-   - Good for: Production use, reliable responses
+    - Model: `openai/gpt-oss-20b:free` (free tier)
+    - Stability: High
+    - Cost: $0
+    - Good for: Development and production use
 
-2. **OpenAI** 
-   - Model: `gpt-4o-mini`
-   - Speed: Very fast
-   - Cost: Low (~$0.15 per 1M tokens)
-   - Good for: Quick responses, cost-effective production
+2. **OpenAI**
+    - Model: `gpt-4o-mini`
+    - Speed: Very fast
+    - Cost: Low (~$0.15 per 1M tokens)
+    - Good for: Quick responses, cost-effective production
 
 3. **Google Gemini**
-   - Model: `gemini-1.5-flash`
-   - Speed: Fast
-   - Cost: Low (~$0.075 per 1M tokens)
-   - Good for: Development, testing
+    - Model: `gemini-2.0-flash-lite`
+    - Speed: Fast
+    - Cost: Free tier (15 requests/min)
+    - Note: Limited quota on free tier
+    - Good for: Development, testing
 
 #### Switching Providers:
 
 Simply change `AI_PROVIDER` in `.env.local` and restart the dev server:
+
 ```bash
 AI_PROVIDER=openai     # Switch to OpenAI
 AI_PROVIDER=gemini     # Switch to Gemini
@@ -63,6 +65,7 @@ AI_PROVIDER=openrouter # Back to default
 ```
 
 #### Cost Estimates:
+
 - Demo usage (40 listings): ~$0.50-$1.00
 - Production (1000 queries/day): ~$5-15/day depending on provider
 
@@ -125,54 +128,45 @@ lib/
 - [ ] Test changes work (`npm run build && npm run lint`)
 - [ ] Then commit with descriptive message
 
-## Team Coordination
+## Development Workflow
 
-### Git Workflow
+### Git Best Practices
 
 ```bash
 git pull origin main                    # Always pull first
-git checkout -b feature/chatbot-ui      # Feature branches
-git commit -m "feat: add safety scores" # Clear commit messages
+git checkout -b feature/map-integration # Feature branches
+git commit -m "feat: add Mapbox map"   # Conventional commits
 ```
 
-### Communication Rules
+### Development Pattern
 
-- **Discord check-ins every 2 hours**
-- **Share blockers immediately**
-- **Test before pushing**: `npm run build && npm run lint`
-- **Mock data during UI dev** - save API costs
-
-### Rapid Development
-
-**Pattern**: Types → Mock data → UI → Real API
+**Recommended approach**: Types → Mock data → UI → Real API
 
 ```typescript
 // 1. Define interface
-interface CardProps { listing: Listing }
+interface VenueCardProps { 
+  venue: Listing;
+  onClose: () => void;
+}
 
-// 2. Mock data first
-const mockData = { ... }
+// 2. Use mock data during development
+const mockVenue = mockListings[0];
 
-// 3. Build UI, connect API last
+// 3. Build UI components
+// 4. Connect to real APIs last
 ```
 
-### Crisis Management
+### Performance Tips
 
-- **Don't panic push** - coordinate first
-- **Quick revert**: `git reset --hard HEAD~1`
-- **API limits**: Use cached demo responses
-- **Merge conflicts**: Ask for help immediately
-
-### Demo Day
-
-- **Deploy 2 hours early** (not localhost)
-- **Backup demo data** if APIs fail
-- **Focus on functionality** over perfect styling
+- **Use mock data during development** to save API costs
+- **Test before committing**: `npm run build && npm run lint`
+- **Enable response caching** to avoid duplicate API calls
+- **Use free tier models** (OpenRouter) during development
 
 ## Reference
 
 **Documentation**: [README.md](README.md) | [CLAUDE.md](CLAUDE.md) | [DESIGN.md](DESIGN.md)
-**Next Steps**: ✅ ~~Chatbot integration~~ → ✅ ~~**Actionable logistics complete**~~ → ✅ ~~**AI-powered quick actions + UX polish**~~ → ✅ ~~**Smart Interview Process (PRODUCTION READY)**~~ → **Dual persona interfaces** (Planner + Explorer) + **Data curation** (Jean-Luc + Felix) → Deploy → Demo prep (PRODUCTION READY!)
+**Next Steps**: ✅ ~~Chatbot integration~~ → ✅ ~~**Actionable logistics complete**~~ → ✅ ~~**AI-powered quick actions + UX polish**~~ → ✅ ~~**Smart Interview Process (PRODUCTION READY)**~~ → ✅ ~~**API Error Handling + Token Optimization**~~ → **Map integration (Mapbox)** + **Calendar export** → Deploy → Demo prep (PRODUCTION READY!)
 
 **DEMO-CRITICAL COMPLETED**: ✅ Enhanced mock data + chatbot responses with actionable logistics (hours, schedules, eSIM-friendly booking) + AI-powered contextual quick actions with welcome message optimization
 
@@ -180,13 +174,14 @@ const mockData = { ... }
 
 **TECHNICAL IMPLEMENTATION**: Hybrid architecture complete - stable data stored locally with comprehensive logistics fields
 
-## Data Curation Team Guide (Jean-Luc, Felix)
+## Data Integration Guide
 
-### **Available APIs from Organizers**
+### **Available APIs for Future Integration**
 
-- **ScrapingDog**: Web scraping for reviews and venue details
-- **OpenRouter**: Access to multiple LLM models for data processing
-- **Potentially**: Google Places API, other APIs Sam can provide
+- **HappyCow API**: Restaurant data and reviews
+- **Google Places API**: Hours, contact info, real-time data
+- **OpenRouter**: AI processing for review analysis
+- **Booking platforms**: Accommodation availability
 
 ### **Target Data Sources**
 

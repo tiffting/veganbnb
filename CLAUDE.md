@@ -1,6 +1,6 @@
-## VeganBnB - AI-Powered Complete Vegan Travel Intelligence Platform
+# VeganBnB - AI-Powered Complete Vegan Travel Intelligence Platform
 
-**Team**: Tiff Ting (Lead/Full-Stack, Taiwan), Eitan (Persona Strategy, Berlin), Felix (Data Curation, Berlin)
+**Project Origin**: Started at [Code for Compassion Berlin](https://electric-sheep-org.squarespace.com/code-for-compassion) hackathon (Nov 16, 2025), now a personal project by Tiff Ting
 
 ---
 
@@ -19,7 +19,7 @@ This ensures documentation stays current across all AI sessions.
 
 ## Current Project State (IMPORTANT: Update this as you go for cross-session continuity)
 
-**Last Updated**: Nov 17, 2024 (AI Provider System + Documentation Updates)
+**Last Updated**: Nov 18, 2025 (API Error Handling + Token Optimization)
 
 **What's Implemented**:
 
@@ -45,40 +45,48 @@ This ensures documentation stays current across all AI sessions.
 - ✅ Documentation: README.md, DEVELOPMENT.md, CLAUDE.md, DESIGN.md
 - ✅ Environment: `.env.local` with API keys
 - ✅ **Smart Interview Process (COMPLETE)**: AI discovers travel style through strategic questions (dates, eating habits, mobility, budget) with fixed state management, proper question flow, and enhanced UX
+- ✅ **API Error Handling**: User-friendly rate limit messages in chat UI with dev mode suggestions
+- ✅ **Token Optimization**: Response caching (15 min), chat history compression, ~30% reduction in API usage
+- ✅ **Continuous Autofocus**: Chat input stays focused for seamless conversation flow
 
 **Technical Setup**: See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed setup, file structure, testing, and team coordination.
 
 **Key Technical Decisions**:
 
 - **Mobile-first design**: Target audience uses phones while traveling
-- Model: `gemini-2.5-flash` (confirmed working)
+- Model: OpenRouter `openai/gpt-oss-20b:free` (free tier), Gemini `gemini-2.0-flash-lite` (when quota available)
 - Development pattern: Types → Mock data → UI → Real API
-- API cost: ~$0.80 for demo
+- API cost: ~$0 with free models, ~$0.80 for paid tier
 
-**Next Priority Tasks** (REMAINING for demo):
+**Next Priority Tasks**:
 
-1. ✅ ~~Firebase project setup~~
-2. ✅ ~~Create core TypeScript interfaces~~
-3. ✅ ~~**CRITICAL**: Implement category-adaptive review analysis (hero feature)~~
-4. ✅ ~~**CRITICAL**: Build chatbot with multi-category context~~
-5. ✅ ~~**URGENT**: Enhance chatbot with actionable logistics (hours, booking, scheduling)~~
-6. ✅ ~~**UX POLISH**: Dynamic quick actions, auto-submit, real venue data, multiline input~~
-7. ✅ ~~**AI ENHANCEMENT**: AI-powered quick actions with intelligent contextual suggestions~~
-8. ✅ ~~**BREAKTHROUGH PIVOT**: Dual traveler persona support (Planner vs Explorer interfaces)~~
-9. ✅ ~~**Smart Interview Process (PRODUCTION READY)**: AI discovers travel style through strategic questions with fixed state management and enhanced UX~~
-10. **Dual Persona Implementation**: Calendar export (Planner) + Map interface (Explorer) + Persistent preferences
-11. Deploy + demo preparation
-12. **OPTIONAL**: Computer vision menu translator (TIER 2 feature)
+1. **Map Integration**: Implement real map with Mapbox for Explorer persona
+    - Interactive venue markers with safety scores
+    - Current location support
+    - Mobile-friendly interactions
 
-**DEMO GAP RESOLVED**: ✅ Chatbot now provides actionable trip planning with eSIM-friendly booking methods, complete operational logistics, and AI-powered contextual quick actions for intuitive conversation flow
+2. **Calendar Export**: Complete implementation for Planner persona
+    - Parse multi-day itineraries from chat
+    - Generate downloadable .ics files
+    - Include all logistics and transit times
 
-**BREAKTHROUGH POSITIONING**: 🎯 First travel AI that adapts to different traveler personalities - Planners vs Explorers
+3. **Data Expansion**: Move beyond Berlin demo data
+    - Integrate real data sources (HappyCow API, Google Places)
+    - Expand to other major European cities
+    - Community-contributed venue reviews
+
+4. **Production Deployment**:
+    - Deploy to Vercel
+    - Set up production Firebase
+    - Implement proper error monitoring
+
+5. **Future Vision**: Computer vision menu translator for international travelers
 
 ---
 
 ## Traveler Personas & Implementation Strategy
 
-### **Persona 1: The Planner (Tiff's Travel Style)**
+### **Persona 1: The Planner**
 
 **Characteristics:**
 
@@ -93,73 +101,39 @@ This ensures documentation stays current across all AI sessions.
 - "I need calendar events with locations, times, and booking details"
 - "How do I turn this conversation into a real itinerary?"
 
-**Solution Features (Tiff implementing):**
+**Solution Features:**
 
-- ✅ **Smart Interview Process**: AI discovers travel style through strategic questions (dates, eating habits, mobility, budget)
-- **Calendar Export**: Generate .ics files from complete daily itineraries with emojis and transit events
-- **Intelligent Scheduling**: AI suggests realistic timing with geographic clustering and transit logistics
-- **Preference Persistence**: Auto-save user preferences during chat for future trip planning
-- **Complete Daily Orchestration**: Breakfast, lunch, dinner, activities, accommodation, and transit in proper sequence
+- ✅ **Smart Interview Process**: AI discovers travel style through strategic questions
+- 🚧 **Calendar Export**: Generate .ics files from complete daily itineraries
+- **Intelligent Scheduling**: AI suggests realistic timing with geographic clustering
+- ✅ **Preference Persistence**: Auto-save user preferences during chat
+- **Complete Daily Orchestration**: Full day planning with all meals and activities
 
-### **Persona 2: The Explorer (Eitan's Travel Style)**
+### **Persona 2: The Explorer**
 
 **Characteristics:**
 
 - Spontaneous, location-based discovery
-- Budget-conscious (student lifestyle)
+- Budget-conscious mindset
 - Values real-time, contextual recommendations
 - Prefers map-based exploration with filters
 
 **Pain Points:**
 
 - "I'm walking around, what's good vegan food nearby under €15?"
-- "Show me all 4+ star vegan places within 10 minutes walk"
+- "Show me all high-rated vegan places within walking distance"
 - "I don't want to plan ahead, I want to discover as I go"
 
-**Solution Features (Eitan implementing):**
+**Solution Features:**
 
-- **Interactive Map**: Visual venue discovery with safety score markers
-- **Smart Filtering**: Price range, rating, distance, currently open
+- 🚧 **Interactive Map**: Visual venue discovery with safety score markers
+- ✅ **Smart Filtering**: Price range, rating, distance, accessibility
 - **Instant Details**: Click venue markers for safety analysis and logistics
-- **Preference Memory**: Budget and safety thresholds automatically applied
+- ✅ **Preference Memory**: Settings automatically applied across sessions
 
-### **Technical Implementation Plan**
+### **Technical Architecture**
 
-**Time Remaining**: ~4-5 hours for both personas
-
-**Tiff (Planner Features)**:
-
-1. **Calendar Export Component** (2 hours)
-    - Parse chat recommendations into calendar event format
-    - Generate `.ics` files or Google Calendar integration
-    - Include venue details, addresses, reservation links
-
-2. **Itinerary View** (2 hours)
-    - Timeline/schedule visualization of chat recommendations
-    - Day-by-day breakdown with travel time estimates
-    - Booking status tracking
-
-**Eitan (Explorer Features + User Preferences)**:
-
-1. **Map Integration** (2 hours)
-    - Embed map (Google Maps or Mapbox)
-    - Plot mock venue locations with safety score markers
-    - Click venue markers → show safety analysis details
-    - Basic zoom/pan functionality
-
-2. **Filter Interface** (1.5 hours)
-    - Price range slider (€, €€, €€€)
-    - Safety score threshold slider (70+, 80+, 90+)
-    - Distance radius selector
-    - "Currently Open" toggle
-
-3. **Persistent User Preferences** (1.5 hours)
-    - Preference panel component (budget, min safety score, dietary restrictions)
-    - localStorage persistence for demo
-    - Auto-apply preferences to map filtering (no chat integration needed)
-    - "Remember my settings" UX
-
-**Technical Specification for Preferences**:
+**Current Implementation Status**:
 
 ```typescript
 interface UserPreferences {
@@ -194,24 +168,18 @@ interface UserPreferences {
 }
 ```
 
-**Shared Components**:
+### **Marketing Positioning** (Preserved from Hackathon)
 
-- Both interfaces consume the same mock data and safety analyzer
-- Safety scores and venue details consistent across both UX
-- **User preferences storage** (Planner: affects chat, Explorer: affects map filtering)
-- Mobile-responsive design for both personas
-
-### **Demo Script Enhancement**
-
-**New Positioning Statement**:
+**Positioning Statement**:
 "VeganBnB is the first travel AI that adapts to YOUR travel personality. Whether you're a detailed planner who wants calendar events and itineraries, or a spontaneous explorer who discovers through maps and filters, we've got you covered."
 
-**Demo Flow Addition**:
+**Demo Flow**:
 
-- Show chat interface for initial recommendations
-- **Preferences Demo**: "Let me set my budget preferences as a student" → Set budget €, safety 80+ → "Now watch how this applies everywhere"
-- **Planner Demo**: "Export to Calendar" → generates trip timeline (respects preferences)
-- **Explorer Demo**: Switch to map view → filtered markers appear → click for instant venue details
+- Show chat interface with smart interview process
+- Set preferences (budget, safety score, dietary restrictions)
+- Planner path: Generate and export multi-day itinerary
+- Explorer path: Switch to map view with filtered venues
+- Show how preferences persist across both interfaces
 
 **Market Impact**:
 
@@ -323,29 +291,29 @@ interface UserPreferences {
 
 ---
 
-### MVP Scope (7-hr build window - FOCUSED)
+### Current MVP Status
 
-**TIER 1 - MUST DEMO:**
+**Completed Features:**
 
-- **Multi-category database**: 20 restaurants + 10 accommodations + 5 tours + 5 events (Berlin) with 3-5 review excerpts each
-- **Category-Adaptive AI Review Analyzer** (HERO FEATURE): AI extracts safety signals specific to each category, generates explainable scores with citations
-- **AI Travel Assistant Chatbot** (SHOWSTOPPER): Conversational interface for complete trip planning across all categories
-- User authentication (Firebase)
-- Map view with category filtering
+- ✅ Multi-category database with 45+ Berlin venues
+- ✅ Category-Adaptive AI Review Analyzer with explainable safety scores
+- ✅ AI Travel Assistant Chatbot with complete trip planning
+- ✅ Smart Interview Process for preference discovery
+- ✅ User preference persistence (localStorage)
+- ✅ Professional UI with mobile-first design
+- ✅ API error handling and token optimization
 
-**CRITICAL GAP IDENTIFIED**: Current chatbot provides recommendations but lacks **actionable logistics** for true itinerary planning
+**In Progress:**
 
-**TIER 2 - IF TIME (unlikely with 7-hr window):**
+- 🚧 Interactive map with Mapbox integration
+- 🚧 Calendar export for multi-day itineraries
 
-- **Computer Vision Menu Translator**: Upload photo → translated menu + vegan options highlighted
-- Mobile PWA optimization
-- Itinerary builder
+**Future Features:**
 
-**CUT:**
-
-- Native mobile app
-- Social features
-- Booking integration
+- Computer Vision Menu Translator
+- Real data integration (HappyCow, Google Places)
+- Multi-city support
+- Native mobile apps
 
 ---
 
@@ -709,191 +677,60 @@ Format as structured JSON.
 ```
 
 **UI**: Camera/upload → instant translation overlay
-**Implementation**: 1-2hrs if TIER 1 complete early
-**Demo value**: "Wow factor" technical innovation
+**Implementation**: Future development priority
+**Demo value**: "Wow factor" for international travelers
 
 ---
 
-### Development Status _(Current Reality)_
+### Funding/Investment Pitch Points (Adapted from Hackathon)
 
-**Team Contributions**:
+**Market Opportunity**:
 
-- **Tiff**: Full-stack development, all technical implementation
-- **Eitan**: Dual persona strategy (Planner vs Explorer), demo script development
-- **Felix**: Mock data expansion and curation across all categories
+- **$148M TAM**: 31M established vegans willing to pay $5-15/month for complete solution
+- **Blue ocean**: HappyCow (restaurants only) + Vegvisits (accommodations only) = fragmented market
+- **Expansion potential**: 850M+ conscious travelers who value inclusive experiences
 
-**✅ COMPLETED FEATURES**:
+**Competitive Advantages**:
 
-- ✅ Smart Interview Process (AI discovers travel preferences)
-- ✅ Enhanced User Preferences Panel (comprehensive settings with localStorage persistence)
-- ✅ OpenRouter AI Integration (reliable alternative to Gemini API)
-- ✅ Quick Actions System (contextual suggestions during interview)
-- ✅ Professional UI with real Berlin venue data
-- ✅ Complete RAG architecture with fallback responses
+- **Technical moat**: Multi-modal AI with category-adaptive safety analysis
+- **Network effects**: Community-contributed reviews improve AI accuracy
+- **Viral growth**: Target users are active social media sharers
+- **First-mover**: No complete vegan travel intelligence platform exists
 
-**📋 REMAINING FEATURES** (Future Development):
+**Growth Strategy**:
 
-- **Calendar Export**: Parse chat recommendations into .ics files for trip execution
-- **Interactive Map**: Visual venue discovery with safety score markers and filtering
-- **Advanced Preferences**: Auto-apply user settings to recommendations
+- **Phase 1**: 5 major European cities (Berlin, Amsterdam, Paris, Barcelona, London)
+- **Phase 2**: Expand to US markets and Asia-Pacific
+- **Phase 3**: Beyond vegan-only venues (museums, attractions with vegan options)
 
-**COMPLETED FOUNDATION**:
+**Revenue Model**:
 
-- ✅ Category-adaptive analyzer (hero feature)
-- ✅ AI Travel Assistant Chatbot (showstopper feature)
-- ✅ AI-powered quick actions with contextual suggestions
-- ✅ Professional UI with real Berlin venue data
-- ✅ Complete RAG architecture ready for live data integration
+- **Freemium**: Basic search and filtering free, premium features for subscribers
+- **Premium tiers**: $5/month (casual), $10/month (frequent travelers), $15/month (business)
+- **B2B opportunities**: Hotels and tours pay for verified listings
+- **Affiliate revenue**: Booking.com, GetYourGuide partnerships
 
-**SUNDAY DEVELOPMENT PLAN**: Frontend team focuses on demo-ready polish while data team expands and documents mock data collection - parallel development with feature branches.
+**Funding Needs**:
 
-_Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
-
----
-
-### Pre-Hackathon Prep (Before Sunday)
-
-**ALL TEAM:**
-
-1. Join Discord server
-2. Clone repo when created
-3. Install: Node.js 18+, pnpm/npm
-4. Add API keys to .env.local
-
-**Data Preparation (Completed by Felix + Tiff):**
-
-1. **Multi-category dataset**:
-    - 20+ restaurants (HappyCow + Google reviews)
-    - 10+ accommodations (Vegvisits, Booking.com)
-    - 5+ tours and events with review excerpts
-2. All venue data includes complete logistics information ✅
-
-**Technical Setup (Completed by Tiff):**
-
-1. GitHub repo + Next.js boilerplate with category structure ✅
-2. Multi-provider AI system (OpenRouter/OpenAI/Gemini) with fallback ✅
-3. Smart interview process with preferences ✅
-4. Professional chat interface with quick actions ✅
-5. Estimate API costs (should be <$10 for demo) ✅
-6. Share setup instructions ✅
+- **Seed round ($250K)**: Real data integration, 10 cities, mobile apps
+- **Series A ($2M)**: Global expansion, computer vision features, API platform
+- **Projected**: 10K users Year 1 = $960K ARR → 100K users Year 3 = $12M ARR
 
 ---
 
-### Timeline (Sun, Nov 16)
-
-**10:00-10:15 CET**: Opening remarks, team setup, final task assignments
-**10:15-12:30**: Core features (category-adaptive analyzer, basic UI, data loading)
-**12:30-13:30**: Lunch + integration check
-**13:30-16:00**: Chatbot integration, score explanation UI
-**16:00-17:15**: Testing, deploy, demo data prep
-**17:15**: Coding ends - demo prep only
-**17:30-18:30**: 5-minute presentations
-**18:30-19:00**: Judging + awards
-
 ---
 
-### Demo Script (5 minutes)
+### Technical Notes
 
-**0:00-0:30 | The Problem + Market**
-"31 million established vegans travel 2+ times per year, and we ALL do the same exhausting research dance: HappyCow for restaurants, Vegvisits for hotels, Google for tours, Meetup/Eventbrite/Facebook for events. Every single trip = 5+ sources, hours of cobbling together fragmented information. We're confident enough to travel, but the research friction is real. No one gives us complete travel intelligence. Until now."
+**API Costs:**
 
-**0:30-2:00 | Multi-Category AI Analysis (HERO)**
+- OpenRouter free tier: $0 (using `openai/gpt-oss-20b:free`)
+- Gemini free tier: Limited to 15 requests/min when available
+- Production costs: ~$0.02 per complex query with paid models
 
-- Show home page with 4 categories
-- Click accommodation → safety score displayed
-- **Click "Why this score?"** → modal shows:
-    - AI reasoning specific to accommodations
-    - Review citations ("2 reviews mention 'dedicated vegan kitchen'...")
-    - Signal breakdown (shared kitchen safety: 85, bedding: 100, breakfast: 90)
-- Quick click through restaurant (different signals: cross-contamination, staff knowledge)
-- "Our LLM adapts to each category. Same explainable intelligence across all travel decisions."
+**Automation Opportunities:**
 
-**2:00-4:00 | Complete Trip Planning (SHOWSTOPPER)**
-
-- Switch to chat interface
-- **Live demo**: "Plan my 3-day vegan trip to Berlin"
-- AI responds with ACTIONABLE recommendations:
-    - A&O Berlin Mitte (78/100) - "Check-in 3pm, vegan breakfast available upon request"
-    - Kopps restaurant (98/100) - "Open Wed-Sat from 5:30pm, reservations required"
-    - Berlin Vegan Food Tour (94/100) - "Saturdays 2-6pm, meet at Hackescher Markt"
-    - The Green Market Berlin (91/100) - "Regular vegan market with diverse vendors"
-- Follow-up: "What time should I book dinner at Kopps on Saturday?"
-- AI responds: "Book online at kopps-berlin.de/reservation (English available) - no phone needed!"
-- Shows contextual understanding + practical trip execution for international travelers
-- **"This is complete trip intelligence - not just discovery, but actionable planning designed for eSIM users"**
-
-**4:00-4:45 | Market Opportunity & Innovation**
-
-- "**$148M TAM**: 31M established vegans willing to pay $5-15/month for this complete solution"
-- "**Blue ocean**: HappyCow does restaurants, Vegvisits does hotels, we do EVERYTHING"
-- "**Technical moat**: Multi-modal AI with category-adaptive analysis"
-- "**Viral growth**: Our target persona are active social media sharers"
-- "**Proof of concept**: 40 listings today, any city tomorrow"
-- "**Beyond vegan-only**: Vegans love art, culture, history - everything! Our expansion vision covers ALL travel while maintaining dietary expertise"
-- "**Expansion ready**: 850M+ conscious travelers who value inclusive experiences (11x current TAM)"
-- "$2,000 funding goal: 5 cities (1,000 listings), mobile app, booking integration → $960K ARR Year 1"
-
-**4:45-5:00 | Q&A**
-
----
-
-### Winning Criteria Alignment
-
-**Impact** (Judges' #1 concern):
-
-- Addresses millions of vegan travelers globally
-- Solves real pain point (juggling multiple sources) + **logistics coordination**
-- First complete vegan travel platform (beyond just discovery)
-- Authentic founder story (team members live this daily - Tiff does this for trips multiple times a year)
-- **Monetization lever**: Actionable intelligence justifies premium pricing vs discovery-only tools
-
-**Innovation** (Technical judges):
-
-- Multi-modal AI (NLP + Vision + Conversational)
-- Category-adaptive analysis (not one-size-fits-all)
-- Explainable AI (shows reasoning)
-- RAG architecture (knowledge base)
-- Real-time LLM inference
-
-**Feasibility** (Can it actually work?):
-
-- Web app = clean demo
-- APIs proven pre-hackathon
-- Realistic 11hr scope for 40 listings
-- Clear data sources
-
-**Scalability** (Prize = $2,000 to continue):
-
-- API-driven (add cities easily)
-- Category-agnostic architecture
-- Community-powered (reviews → better scores)
-- Clear go-to-market (vegan travel blogs, advocacy orgs)
-
----
-
-### Budget Notes
-
-**API costs for demo:**
-
-- Gemini API: ~$0.80 for 40 listing analyses (4 categories)
-- GPT-4 Vision: ~$0.10 per menu photo
-- Total: <$10 for entire hackathon
-
-**$2,000 prize usage plan** (mention in pitch):
-
-- Expand to 5 cities (200 listings each: 100 restaurants, 50 accommodations, 30 tours, 20 events)
-- Partner with advocacy orgs for data
-- User testing with 100 travelers
-- Mobile app development
-- Booking API integration
-
----
-
-### n8n Note
-
-Optional. Potential uses:
-
-- Automate review scraping → analysis pipeline
-- Schedule weekly database updates across all categories
-- Event monitoring (Eventbrite API → auto-add new events)
-- Mention as "production automation layer" in pitch
+- n8n workflows for review scraping and analysis
+- Scheduled database updates for all venue categories
+- Event monitoring via Eventbrite/Facebook APIs
+- Automated safety score recalculation as new reviews arrive

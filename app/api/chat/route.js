@@ -1,5 +1,11 @@
 import { getAICompletion, getAIProviderInfo } from "../../../lib/ai-config.js";
 import { mockListings, getListingsByCategory, getHighScoringListings } from "../../../lib/mock-data.js";
+import { 
+  getCachedResponse, 
+  setCachedResponse, 
+  compressChatHistory,
+  estimateTokens 
+} from "../../../lib/token-optimization.js";
 
 export async function POST(request) {
   try {
@@ -18,11 +24,33 @@ export async function POST(request) {
     }
 
 
+    // Check cache first
+    const cachedResponse = getCachedResponse(message, userPreferences);
+    if (cachedResponse) {
+      console.log('📦 Serving cached response for:', message.substring(0, 50));
+      return Response.json({
+        response: cachedResponse,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          cached: true,
+          listingReferences: extractListingReferences(cachedResponse),
+          categories: inferCategoriesFromMessage(message),
+        }
+      });
+    }
+
     // Get context from all listings for RAG-style responses
     const context = buildTravelContext();
     
+    // Optimize chat history for token efficiency
+    const optimizedHistory = compressChatHistory(chatHistory);
+    
     // Build conversation prompt with context injection and user preferences
-    const prompt = buildChatPrompt(message, chatHistory, context, userPreferences);
+    const prompt = buildChatPrompt(message, optimizedHistory, context, userPreferences);
+    
+    // Log token estimation
+    const estimatedTokens = estimateTokens(prompt);
+    console.log(`📊 Estimated tokens: ${estimatedTokens}`);
     
     // Try AI API first, fallback to hardcoded responses for development
     let text;
@@ -36,9 +64,51 @@ export async function POST(request) {
         maxTokens: 1000,
         temperature: 0.7,
       });
+      
+      // Cache successful responses
+      setCachedResponse(message, userPreferences, text);
     } catch (error) {
-      console.log('AI API unavailable, using fallback response:', error.message);
-      // Fallback to hardcoded responses for development
+      console.error('AI API error:', error);
+      
+      // Check if it's a rate limit error
+      if (error.status === 429 || error.code === 'rate_limit_exceeded') {
+        const aiInfo = getAIProviderInfo();
+        
+        // Extract retry information
+        const retryAfter = error.headers?.['retry-after'] || error.headers?.get?.('retry-after');
+        const retryAfterSeconds = retryAfter ? parseInt(retryAfter) : null;
+        
+        // Format retry time in human-readable format
+        let retryTimeText = "";
+        if (retryAfterSeconds) {
+          const hours = Math.floor(retryAfterSeconds / 3600);
+          const minutes = Math.floor((retryAfterSeconds % 3600) / 60);
+          if (hours > 0) {
+            retryTimeText = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes > 1 ? 's' : ''}`;
+          } else {
+            retryTimeText = `${minutes} minute${minutes > 1 ? 's' : ''}`;
+          }
+        }
+        
+        // Development mode suggestions
+        const devModeSuggestions = process.env.NODE_ENV === 'development' ? 
+          "Switch AI providers in your .env.local file:\n\n• Set AI_PROVIDER=openrouter (recommended)\n\n• Set AI_PROVIDER=gemini\n\n• Set AI_PROVIDER=openai (current)" : "";
+        
+        return Response.json({
+          error: "rate_limit",
+          message: `Oops! The ${aiInfo.provider} AI service is taking a break. ${retryTimeText ? `Please try again in ${retryTimeText}.` : 'Please try again later.'}`,
+          fallbackResponse: generateFallbackResponse(message, chatHistory),
+          devModeSuggestions,
+          metadata: {
+            provider: aiInfo.provider,
+            model: aiInfo.model,
+            retryAfterSeconds
+          }
+        }, { status: 429 });
+      }
+      
+      // For other errors, use fallback
+      console.log('Using fallback response due to error');
       text = generateFallbackResponse(message, chatHistory);
     }
 

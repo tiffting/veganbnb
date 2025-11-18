@@ -358,7 +358,7 @@ function TravelDatesStep({
                 <label className="block text-lg font-medium text-gray-900 mb-3">When are you traveling?</label>
                 <input
                     type="text"
-                    placeholder="e.g., March 15-18, 2024 or Dec 20-23"
+                    placeholder="e.g., 20-23 Dec"
                     className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     style={{ fontSize: "16px" }}
                     value={preferences.tripPreferences?.travelDates || ""}
@@ -557,16 +557,18 @@ function TransportationStep({
 
 export default function OnboardingPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <span className="text-white font-bold text-sm">V</span>
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <span className="text-white font-bold text-sm">V</span>
+                        </div>
+                        <p className="text-gray-600">Loading...</p>
                     </div>
-                    <p className="text-gray-600">Loading...</p>
                 </div>
-            </div>
-        }>
+            }
+        >
             <OnboardingContent />
         </Suspense>
     );
