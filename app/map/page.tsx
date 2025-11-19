@@ -9,7 +9,7 @@ export default function MapPage() {
 
     useEffect(() => {
         // Check if user has completed onboarding
-        const hasCompletedOnboarding = localStorage.getItem("veganbnb-user-preferences");
+        const hasCompletedOnboarding = localStorage.getItem("navegate-user-preferences");
         
         if (!hasCompletedOnboarding) {
             // Redirect to onboarding if no preferences found

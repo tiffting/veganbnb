@@ -138,7 +138,7 @@ function OnboardingContent() {
         };
 
         // Save preferences to localStorage
-        localStorage.setItem("veganbnb-user-preferences", JSON.stringify(finalPreferences));
+        localStorage.setItem("navegate-user-preferences", JSON.stringify(finalPreferences));
 
         // Route based on persona
         if (persona === "structured") {
@@ -174,7 +174,7 @@ function OnboardingContent() {
             },
         };
 
-        localStorage.setItem("veganbnb-user-preferences", JSON.stringify(minimalPreferences));
+        localStorage.setItem("navegate-user-preferences", JSON.stringify(minimalPreferences));
 
         // Route based on persona
         if (selectedPersona === "structured") {
@@ -196,9 +196,11 @@ function OnboardingContent() {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">V</span>
+                                <span className="text-white font-bold text-sm">N</span>
                             </div>
-                            <span className="font-semibold text-gray-900">VeganBnB</span>
+                            <span className="font-semibold text-gray-900">
+                                Na<span className="text-green-600">Veg</span>ate
+                            </span>
                         </div>
 
                         <button onClick={handleSkip} className="text-gray-500 hover:text-gray-700 transition-colors text-sm">

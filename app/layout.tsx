@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VeganBnB - AI-Powered Vegan Travel Intelligence",
+  title: "NaVegate - AI-Powered Vegan Travel Intelligence",
   description: "Complete vegan travel planning with AI-powered safety scores across restaurants, accommodations, tours, and events. Stop juggling multiple apps.",
   icons: {
     icon: '/icon.svg',

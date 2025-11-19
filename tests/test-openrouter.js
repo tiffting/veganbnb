@@ -26,7 +26,7 @@ async function testOpenRouter() {
             messages: [
                 {
                     role: "system",
-                    content: "You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning.",
+                    content: "You are NaVegate's AI Travel Assistant, specializing in complete vegan travel planning.",
                 },
                 {
                     role: "user",
@@ -44,7 +44,7 @@ async function testOpenRouter() {
         console.log("🎯 Usage:", completion.usage);
         console.log("\n💬 Sample response:");
         console.log(response);
-        console.log("\n🚀 OpenRouter integration ready for VeganBnB!");
+        console.log("\n🚀 OpenRouter integration ready for NaVegate!");
     } catch (error) {
         console.error("❌ OpenRouter API test failed:", error.message);
         if (error.status === 401) {

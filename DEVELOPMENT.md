@@ -15,7 +15,10 @@ OPENROUTER_API_KEY=your_openrouter_api_key  # For OpenRouter (default)
 OPENAI_API_KEY=your_openai_api_key          # For OpenAI GPT-4o-mini
 GEMINI_API_KEY=your_gemini_api_key          # For Google Gemini
 
-# Firebase & Maps APIs added later
+# Database & Maps APIs
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# GOOGLE_MAPS_API_KEY=your_maps_key  # For future map integration
 ```
 
 ### Essential Commands
@@ -31,7 +34,7 @@ node tests/test-ai-config.js
 
 ### AI Provider Configuration
 
-VeganBnB uses a centralized AI configuration system (`lib/ai-config.js`) that supports multiple providers:
+NaVegate uses a centralized AI configuration system (`lib/ai-config.js`) that supports multiple providers:
 
 #### Available Providers:
 
@@ -108,7 +111,7 @@ lib/
 ├── types.ts     # Shared types
 ├── mock-data.js # Shared test data
 ├── prompts.js   # AI agent prompts
-└── firebase.js  # Database for storing venues
+└── supabase.ts  # Database client configuration
 ```
 
 ### Development Principles
@@ -163,6 +166,62 @@ const mockVenue = mockListings[0];
 - **Enable response caching** to avoid duplicate API calls
 - **Use free tier models** (OpenRouter) during development
 
+## Database Strategy (Supabase)
+
+### Migration Philosophy
+
+**IMPORTANT for Claude sessions**: Always follow this approach for database changes.
+
+#### Current Stage (Solo Development)
+- **Direct hosted changes**: Use Supabase dashboard for schema modifications
+- **Simple migrations**: Add columns, create tables, basic changes only
+- **Reversible operations**: Ensure all changes can be undone
+- **Document changes**: Update types and mock data immediately
+
+#### Migration Guidelines
+
+```typescript
+// ✅ GOOD: Simple, additive changes
+ALTER TABLE venues ADD COLUMN opening_hours JSONB;
+ALTER TABLE venues ADD COLUMN price_range VARCHAR(10);
+
+// ⚠️ CAREFUL: Dropping columns (ensure no dependencies)
+ALTER TABLE venues DROP COLUMN old_field; -- Only after confirming unused
+
+// ❌ AVOID: Complex data transformations during development
+// Save these for when you have staging environment
+```
+
+#### Development Workflow
+
+1. **Schema changes**: Make directly in Supabase dashboard
+2. **Update types**: Modify `lib/types.ts` immediately  
+3. **Update mock data**: Keep `lib/mock-data.js` in sync
+4. **Test immediately**: Verify app still works
+5. **Document changes**: Update relevant files
+
+#### Safety Practices
+
+- **Backup strategy**: Supabase auto-backups + recreatable from mock data
+- **Team communication**: Document all schema changes in commits
+- **Rollback plan**: Keep migrations simple enough to reverse manually
+
+#### When to Add Staging Environment
+
+Consider adding a staging Supabase project when:
+- Real users exist (production data matters)
+- Complex migrations needed (multi-step transformations)  
+- Team development (multiple developers)
+- Custom Postgres functions required
+
+#### Migration Documentation
+
+**Always update these files after schema changes:**
+- `lib/types.ts` - TypeScript interfaces
+- `lib/mock-data.js` - Test data structure  
+- `README.md` - If API changes
+- `CLAUDE.md` - Current implementation status
+
 ## Reference
 
 **Documentation**: [README.md](README.md) | [CLAUDE.md](CLAUDE.md) | [DESIGN.md](DESIGN.md)
@@ -200,7 +259,7 @@ const mockVenue = mockListings[0];
 - **Current mock data** in `lib/mock-data.js` - shows expected data structure
 - **API routes** in `app/api/` - modify to fetch live data instead of mock
 - **Safety score analyzer** in `app/api/analyze/route.js` - ready for real reviews
-- **Database schema** - Firebase Firestore already set up for live data
+- **Database schema** - Supabase PostgreSQL configured for live data
 
 ### **Development Workflow**
 

@@ -86,7 +86,7 @@ export default function UserPreferences({ onPreferencesChange }: UserPreferences
   // Load preferences from localStorage on mount
   useEffect(() => {
     const loadPreferences = () => {
-      const saved = localStorage.getItem('veganbnb-user-preferences');
+      const saved = localStorage.getItem('navegate-user-preferences');
       if (saved) {
         try {
           const parsedPreferences = JSON.parse(saved);
@@ -121,7 +121,7 @@ export default function UserPreferences({ onPreferencesChange }: UserPreferences
 
   // Save preferences to localStorage
   const savePreferences = () => {
-    localStorage.setItem('veganbnb-user-preferences', JSON.stringify(preferences));
+    localStorage.setItem('navegate-user-preferences', JSON.stringify(preferences));
     setHasUnsavedChanges(false);
     setSaveSuccess(true);
     onPreferencesChange?.(preferences);
@@ -179,7 +179,7 @@ export default function UserPreferences({ onPreferencesChange }: UserPreferences
   const handleOpenChange = (open: boolean) => {
     if (open) {
       // Reload preferences from localStorage when opening
-      const saved = localStorage.getItem('veganbnb-user-preferences');
+      const saved = localStorage.getItem('navegate-user-preferences');
       if (saved) {
         try {
           const parsedPreferences = JSON.parse(saved);

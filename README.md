@@ -1,4 +1,4 @@
-# VeganBnB - AI-Powered Complete Vegan Travel Intelligence Platform
+# NaVegate - AI-Powered Complete Vegan Travel Intelligence Platform
 
 **Project Origin**: Started at [Code for Compassion Berlin](https://electric-sheep-org.squarespace.com/code-for-compassion) hackathon (Nov 16, 2025), now a personal project by Tiff Ting
 
@@ -6,7 +6,7 @@ First AI-powered complete vegan travel intelligence platform providing explainab
 
 ## Tech Stack
 
-Next.js 15 + TypeScript + Tailwind + OpenRouter AI + Firebase
+Next.js 15 + TypeScript + Tailwind + OpenRouter AI + Supabase
 
 _Full tech details in [DEVELOPMENT.md](DEVELOPMENT.md)_
 
@@ -31,15 +31,19 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 OPENAI_API_KEY=your_openai_api_key
 GEMINI_API_KEY=your_google_gemini_api_key
 
-# Firebase config ✅
+# Supabase config
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
 # Maps API key (to be added)
+# GOOGLE_MAPS_API_KEY=your_maps_key
 ```
 
 ### Installation
 
 ```bash
 # Clone and install
-git clone https://github.com/tiffting/veganbnb.git
+git clone https://github.com/tiffting/navegate.git
 npm install
 
 # Run development server
@@ -50,7 +54,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## AI Configuration
 
-VeganBnB supports multiple AI providers for flexibility and reliability:
+NaVegate supports multiple AI providers for flexibility and reliability:
 
 - **OpenRouter** (default) - Free tier using `openai/gpt-oss-20b:free` model
 - **OpenAI** - Fast and cost-effective with `gpt-4o-mini`
@@ -93,7 +97,7 @@ First travel AI that adapts to YOUR travel personality - whether you're a detail
 
 ### Demo
 
-**🌐 Live Demo**: https://veganbnb-zeta.vercel.app/
+**🌐 Live Demo**: https://navegate.vercel.app/
 
 **💻 Local Development**: `npm run dev` then visit `http://localhost:3000`
 

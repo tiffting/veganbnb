@@ -93,7 +93,7 @@ export default function TravelSettings({
   // Load settings from localStorage on mount
   useEffect(() => {
     const loadSettings = () => {
-      const saved = localStorage.getItem('veganbnb-user-preferences');
+      const saved = localStorage.getItem('navegate-user-preferences');
       if (saved) {
         try {
           const parsedSettings = JSON.parse(saved);
@@ -128,7 +128,7 @@ export default function TravelSettings({
 
   // Save settings to localStorage
   const saveSettings = () => {
-    localStorage.setItem('veganbnb-user-preferences', JSON.stringify(settings));
+    localStorage.setItem('navegate-user-preferences', JSON.stringify(settings));
     setHasUnsavedChanges(false);
     setSaveSuccess(true);
     onSettingsChange?.(settings);
@@ -185,7 +185,7 @@ export default function TravelSettings({
   // Reload settings when dialog opens to catch external updates
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      const saved = localStorage.getItem('veganbnb-user-preferences');
+      const saved = localStorage.getItem('navegate-user-preferences');
       if (saved) {
         try {
           const parsedSettings = JSON.parse(saved);

@@ -120,7 +120,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
     // Load user settings from localStorage on startup
     useEffect(() => {
         try {
-            const savedSettings = localStorage.getItem("veganbnb-user-preferences");
+            const savedSettings = localStorage.getItem("navegate-user-preferences");
             if (savedSettings) {
                 const settings = JSON.parse(savedSettings);
                 setUserSettings(settings);
@@ -170,7 +170,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                 const debugMessage: Message = {
                     id: `debug-${Date.now() + 1}`,
                     role: "assistant",
-                    content: `**🔍 Debug Info:**\n\n**User Settings Status:** ${userSettings ? "✅ Loaded" : "❌ Not loaded"}\n\n${userSettings ? `**Current Settings:**\n\`\`\`json\n${JSON.stringify(userSettings, null, 2)}\n\`\`\`` : "**localStorage data:** " + localStorage.getItem("veganbnb-user-preferences")}\n\n**How to verify AI sees them:** Check browser console for AI provider messages when you send a regular message.`,
+                    content: `**🔍 Debug Info:**\n\n**User Settings Status:** ${userSettings ? "✅ Loaded" : "❌ Not loaded"}\n\n${userSettings ? `**Current Settings:**\n\`\`\`json\n${JSON.stringify(userSettings, null, 2)}\n\`\`\`` : "**localStorage data:** " + localStorage.getItem("navegate-user-preferences")}\n\n**How to verify AI sees them:** Check browser console for AI provider messages when you send a regular message.`,
                     timestamp: new Date(),
                 };
 
@@ -285,7 +285,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                     };
 
                     // Save to localStorage and update state
-                    localStorage.setItem("veganbnb-user-preferences", JSON.stringify(settings));
+                    localStorage.setItem("navegate-user-preferences", JSON.stringify(settings));
                     setUserSettings(settings);
 
                     console.log("Settings auto-saved from interview:", settings);
@@ -317,7 +317,7 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
             const welcomeMessage: Message = {
                 id: `welcome-${Date.now()}`,
                 role: "assistant",
-                content: `Welcome to VeganBnB! I see you've completed your preferences. I have comprehensive data for **Berlin** with 32 food venues (restaurants, cafes, bars, ice cream), ${getListingsByCategory("accommodation").length} accommodations, ${getListingsByCategory("tour").length} tours, and ${getListingsByCategory("event").length} events.\n\nWhich city would you like to explore for your ${userSettings.tripPreferences?.planningStyle === "structured" ? "structured itinerary planning" : "flexible travel exploration"}?`,
+                content: `Welcome to **Na<span style="color: #059669">Veg</span>ate**! I see you've completed your preferences. I have comprehensive data for **Berlin** with 32 food venues (restaurants, cafes, bars, ice cream), ${getListingsByCategory("accommodation").length} accommodations, ${getListingsByCategory("tour").length} tours, and ${getListingsByCategory("event").length} events.\n\nWhich city would you like to explore for your ${userSettings.tripPreferences?.planningStyle === "structured" ? "structured itinerary planning" : "flexible travel exploration"}?`,
                 timestamp: new Date(),
             };
             setMessages([welcomeMessage]);
@@ -410,7 +410,9 @@ export default function ChatInterface({ initialMessages = [], className }: ChatI
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                            <h2 className="font-semibold text-sm sm:text-lg truncate">VeganBnB</h2>
+                            <h2 className="font-semibold text-sm sm:text-lg truncate">
+                                Na<span className="text-green-600">Veg</span>ate
+                            </h2>
                             <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Your AI guide for complete vegan travel planning</p>
                         </div>
                     </div>

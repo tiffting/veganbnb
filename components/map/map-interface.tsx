@@ -62,7 +62,7 @@ export default function MapInterface({ className }: MapInterfaceProps) {
     // Initialize settings from localStorage
     const [userSettings, setUserSettings] = useState<TravelSettingsType | null>(() => {
         try {
-            const savedSettings = localStorage.getItem("veganbnb-user-preferences");
+            const savedSettings = localStorage.getItem("navegate-user-preferences");
             if (savedSettings) {
                 const settings = JSON.parse(savedSettings);
                 console.log("Loaded existing settings from localStorage:", settings);

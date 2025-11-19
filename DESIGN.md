@@ -1,4 +1,4 @@
-# VeganBnB Design System & UX Strategy
+# NaVegate Design System & UX Strategy
 
 **Target Persona**: Established vegans (1-5 years) who travel 2+ times/year
 
@@ -186,7 +186,7 @@ $desktop: 1024px;   // Tertiary consideration
 ### Value Demonstration
 - **Free tier**: Show depth of analysis preview
 - **Gentle paywall**: "See detailed safety breakdown" → premium
-- **Social proof**: "12,847 vegan travelers trust VeganBnB"
+- **Social proof**: "12,847 vegan travelers trust NaVegate"
 
 ### Premium Justification
 - **Professional aesthetics**: Worth paying for

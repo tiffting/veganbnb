@@ -1,4 +1,4 @@
-# VeganBnB - AI-Powered Complete Vegan Travel Intelligence Platform
+# NaVegate - AI-Powered Complete Vegan Travel Intelligence Platform
 
 **Project Origin**: Started at [Code for Compassion Berlin](https://electric-sheep-org.squarespace.com/code-for-compassion) hackathon (Nov 16, 2025), now a personal project by Tiff Ting
 
@@ -26,14 +26,14 @@ This ensures documentation stays current across all AI sessions.
 - ✅ Next.js 15 project with TypeScript (strict mode)
 - ✅ ESM modules (`"type": "module"` in package.json)
 - ✅ Multi-provider AI system (OpenRouter default, OpenAI, Gemini) via `lib/ai-config.js`
-- ✅ Firebase setup complete (Auth + Firestore, tested)
+- ✅ Supabase setup complete (PostgreSQL + Auth)
 - ✅ TypeScript interfaces complete (`lib/types.ts` with all core types)
 - ✅ Category-adaptive analyzer complete (API + prompts + validation + testing)
 - ✅ **AI Travel Assistant Chatbot complete** (RAG + multi-category context + markdown rendering)
 - ✅ **CRITICAL: Actionable logistics implementation complete** (eSIM-friendly booking, pricing, schedules)
 - ✅ Demo-ready mock data (`lib/mock-data.js` with complete operational details)
 - ✅ Professional UI: Landing page + chat interface (shadcn/ui + Tailwind CSS)
-- ✅ Working test files: `tests/test-gemini.js`, `tests/test-firebase.js`, `tests/test-analyzer.js`, `tests/test-chatbot.js`, `tests/test-quick-actions.js`
+- ✅ Working test files: `tests/test-gemini.js`, `tests/test-analyzer.js`, `tests/test-chatbot.js`, `tests/test-quick-actions.js`
 - ✅ Human-readable safety signal formatting
 - ✅ **Enhanced TypeScript interfaces** (`lib/types.ts` with complete logistics types)
 - ✅ **Real venue data**: All venues are actual Berlin locations with working websites
@@ -77,7 +77,7 @@ This ensures documentation stays current across all AI sessions.
 
 4. **Production Deployment**:
     - Deploy to Vercel
-    - Set up production Firebase
+    - Configure production Supabase settings
     - Implement proper error monitoring
 
 5. **Future Vision**: Computer vision menu translator for international travelers
@@ -171,7 +171,7 @@ interface UserPreferences {
 ### **Marketing Positioning** (Preserved from Hackathon)
 
 **Positioning Statement**:
-"VeganBnB is the first travel AI that adapts to YOUR travel personality. Whether you're a detailed planner who wants calendar events and itineraries, or a spontaneous explorer who discovers through maps and filters, we've got you covered."
+"NaVegate is the first travel AI that adapts to YOUR travel personality. Whether you're a detailed planner who wants calendar events and itineraries, or a spontaneous explorer who discovers through maps and filters, we've got you covered."
 
 **Demo Flow**:
 
@@ -394,7 +394,7 @@ interface UserPreferences {
 - Calendar integration for personal trip planning
 - Smart notifications for schedule changes
 
-**Business Impact**: This transforms VeganBnB from "discovery tool" to "complete travel assistant" - justifying premium pricing and increasing user stickiness.
+**Business Impact**: This transforms NaVegate from "discovery tool" to "complete travel assistant" - justifying premium pricing and increasing user stickiness.
 
 ### Post-Hackathon Vision: Beyond Vegan-Only Content
 
@@ -425,7 +425,7 @@ interface UserPreferences {
 - AI analysis: "This museum has a great vegan cafe" or "Walking distance to 3 vegan restaurants"
 
 **Demo Script Addition**:
-"While we're starting with vegan-specific venues, our vision extends beyond that. Vegans are interested in art, culture, history - everything travelers love. We see VeganBnB expanding to cover all travel categories while maintaining our expertise in dietary accessibility. Think: 'This museum has excellent vegan dining nearby' or 'This architectural walking tour accommodates all dietary needs.'"
+"While we're starting with vegan-specific venues, our vision extends beyond that. Vegans are interested in art, culture, history - everything travelers love. We see NaVegate expanding to cover all travel categories while maintaining our expertise in dietary accessibility. Think: 'This museum has excellent vegan dining nearby' or 'This architectural walking tour accommodates all dietary needs.'"
 
 **Market Sizing Impact**:
 
@@ -530,11 +530,32 @@ interface Listing {
 - **AI**: Flexible provider system - OpenRouter (default), OpenAI, or Google Gemini
     - Configured via `AI_PROVIDER` environment variable
     - Centralized configuration in `lib/ai-config.js`
-- **Database**: Firebase (Firestore + Auth)
+- **Database**: Supabase (PostgreSQL + Auth)
 - **Deploy**: Vercel
 - **Optional**: GPT-4 Vision (menu translation)
 
 _Technical details in [DEVELOPMENT.md](DEVELOPMENT.md)_
+
+### Database Strategy (CRITICAL for Claude sessions)
+
+**Platform**: Supabase hosted PostgreSQL  
+**Migration Philosophy**: Simple, reversible operations during solo development stage.
+
+**Required Workflow for ALL database changes:**
+1. **Schema changes**: Use Supabase dashboard for modifications
+2. **Update types**: Modify `lib/types.ts` immediately after schema changes
+3. **Update mock data**: Keep `lib/mock-data.js` structure in sync  
+4. **Test immediately**: Verify app functionality after changes
+5. **Document**: Update relevant files and commit with clear message
+
+**Guidelines:**
+- ✅ **ALLOWED**: ADD columns, CREATE tables, simple modifications
+- ⚠️ **CAREFUL**: DROP columns (confirm unused in codebase first)
+- ❌ **AVOID**: Complex data transformations (save for staging environment)
+
+**Rollback**: Keep all changes simple enough to reverse manually via dashboard.
+
+_Full database strategy and examples in [DEVELOPMENT.md](DEVELOPMENT.md)_
 
 ---
 

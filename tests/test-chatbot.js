@@ -32,7 +32,7 @@ const testConversations = [
 ];
 
 async function testChatbot() {
-  console.log("🤖 Testing VeganBnB Chatbot\n");
+  console.log("🤖 Testing NaVegate Chatbot\n");
 
   const baseUrl = 'http://localhost:3000';
   let passedTests = 0;

@@ -1,4 +1,4 @@
-// Core business types for VeganBnB platform
+// Core business types for NaVegate platform
 
 // ============================================================================
 // CORE DOMAIN TYPES

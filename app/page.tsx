@@ -14,7 +14,9 @@ export default function Home() {
                                 <MapPin className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-gray-900">VeganBnB</h1>
+                                <h1 className="text-xl font-bold text-gray-900">
+                                    Na<span className="text-green-600">Veg</span>ate
+                                </h1>
                                 <p className="text-sm text-gray-600">AI-Powered Vegan Travel Intelligence</p>
                             </div>
                         </div>
@@ -31,7 +33,9 @@ export default function Home() {
             {/* Hero Section */}
             <div className="max-w-4xl mx-auto px-4 py-16">
                 <div className="text-center">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">AI-Powered Vegan Travel Intelligence</h2>
+                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        Na<span className="text-green-600">Veg</span>ate: AI-Powered Vegan Travel Intelligence
+                    </h2>
                     <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                         The first travel app that adapts to YOUR travel personality. Stop juggling multiple apps: get comprehensive vegan travel intelligence{" "}
                         <span className="whitespace-nowrap">in one place</span>.
@@ -136,10 +140,12 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Why VeganBnB Section */}
+                {/* Why NaVegate Section */}
                 <div className="mt-16 bg-white rounded-lg p-8 shadow-sm border">
                     <div className="text-center mb-8">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Why VeganBnB?</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                            Why Na<span className="text-green-600">Veg</span>ate?
+                        </h3>
                         <p className="text-gray-600">The first complete vegan travel intelligence platform that solves the fragmented research problem.</p>
                     </div>
 
@@ -176,7 +182,10 @@ export default function Home() {
                         <div>
                             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <span className="text-green-500">✅</span>
-                                VeganBnB Complete Solution
+                                <span>
+                                    Na<span className="text-green-600">Veg</span>ate
+                                </span>{" "}
+                                Complete Solution
                             </h4>
                             <div className="space-y-3">
                                 <div className="flex items-start gap-3">

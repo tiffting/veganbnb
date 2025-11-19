@@ -54,7 +54,7 @@ export async function POST(request) {
 
             text = await getAICompletion({
                 systemPrompt:
-                    "You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events.",
+                    "You are NaVegate's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events.",
                 userPrompt: prompt,
                 maxTokens: 2500,
                 temperature: 0.7,
@@ -294,7 +294,7 @@ These are not captured in preferences and are valid follow-up questions.
 `;
     }
 
-    return `You are VeganBnB's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events.
+    return `You are NaVegate's AI Travel Assistant, specializing in complete vegan travel planning across restaurants, accommodations, tours, and events.
 
 CURRENT DATE: ${formattedDate} (${currentYear})
 IMPORTANT: When users mention dates, assume they mean ${currentYear} unless explicitly stated otherwise.
@@ -483,7 +483,7 @@ Which type of cuisine interests you most?`;
     }
 
     // Default helpful response
-    return `## 🌱 Welcome to VeganBnB!
+    return `## 🌱 Welcome to Na**Veg**ate!
 
 I'm your AI travel assistant specializing in **complete vegan travel planning** across:
 - 🍽️ **Restaurants** with safety scores
